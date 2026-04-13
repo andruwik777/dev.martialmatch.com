@@ -1462,6 +1462,49 @@ body {
   background: linear-gradient(180deg, #161922 85%, transparent);
 }
 
+.mm-filter-actions-row {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  align-items: stretch;
+  width: 100%;
+}
+
+.mm-filter-actions-row > .mm-filter-apply-btn,
+.mm-filter-actions-row > .mm-filter-clear-action-btn {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto;
+}
+
+.mm-filter-clear-action-btn {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.65rem;
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #e8e8ec;
+  text-align: center;
+  line-height: 1.2;
+  background: #3d4a66;
+  border: 1px solid #5a6a8a;
+  border-radius: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mm-filter-clear-action-btn:active {
+  background: #4a5878;
+}
+
+.mm-filter-clear-action-btn:focus-visible {
+  outline: 2px solid #5b8cff;
+  outline-offset: 2px;
+}
+
 /* Mobile (Galaxy-class): jedna Apply przyklejona do dołu viewport — patrz .mm-filter-mobile-bar */
 @media (max-width: 40rem) {
   .mm-filter-sticky--desktop {

@@ -80,6 +80,9 @@
   var filterClubJumpToggleBtn = document.getElementById("mm-filter-club-jump-toggle");
   var filterClubJumpListEl = document.getElementById("mm-filter-club-jump-list");
   var filterClearAllBtn = document.getElementById("mm-filter-clear-all-btn");
+  var filterClearAllBtnMobile = document.getElementById(
+    "mm-filter-clear-all-btn-mobile"
+  );
   var filterOnlySelectedCb = document.getElementById("mm-filter-only-selected-cb");
   var filterOnlyEmptyHintEl = document.getElementById("mm-filter-only-empty-hint");
   var filterSearchInputEl = document.getElementById("mm-filter-search-input");
@@ -2985,35 +2988,40 @@
     filterListRootEl.addEventListener("change", onFilterListCheckboxChange);
   }
 
-  if (filterClearAllBtn) {
-    filterClearAllBtn.addEventListener("click", function () {
-      var tab = getCmTabFromUrl();
-      if (
-        (tab === CM_TAB_FIGHTS || tab === CM_TAB_HARMONOGRAM) &&
-        evSlug &&
-        startingListEntries &&
-        startingListEntries.length
-      ) {
-        var inEvent = Object.create(null);
-        for (var ci = 0; ci < startingListEntries.length; ci++) {
-          inEvent[startingListEntries[ci].publicId] = true;
-        }
-        var urlSet = getSlugFilterIdSetFromUrl();
-        if (urlSet) {
-          var remaining = [];
-          for (var k in urlSet) {
-            if (!inEvent[k]) remaining.push(k);
-          }
-          setSlugFilterQueryInUrl(remaining);
-        }
-        syncFilterCheckboxesFromUrl();
-        if (lastFightsData) renderFights(lastFightsData);
-        refreshHarmonogram();
-        applyFilterPanelListVisibility();
-        return;
+  function onFilterClearAllClick() {
+    var tab = getCmTabFromUrl();
+    if (
+      (tab === CM_TAB_FIGHTS || tab === CM_TAB_HARMONOGRAM) &&
+      evSlug &&
+      startingListEntries &&
+      startingListEntries.length
+    ) {
+      var inEvent = Object.create(null);
+      for (var ci = 0; ci < startingListEntries.length; ci++) {
+        inEvent[startingListEntries[ci].publicId] = true;
       }
-      clearAllMemberFilterCheckboxes();
-    });
+      var urlSet = getSlugFilterIdSetFromUrl();
+      if (urlSet) {
+        var remaining = [];
+        for (var k in urlSet) {
+          if (!inEvent[k]) remaining.push(k);
+        }
+        setSlugFilterQueryInUrl(remaining);
+      }
+      syncFilterCheckboxesFromUrl();
+      if (lastFightsData) renderFights(lastFightsData);
+      refreshHarmonogram();
+      applyFilterPanelListVisibility();
+      return;
+    }
+    clearAllMemberFilterCheckboxes();
+  }
+
+  if (filterClearAllBtn) {
+    filterClearAllBtn.addEventListener("click", onFilterClearAllClick);
+  }
+  if (filterClearAllBtnMobile) {
+    filterClearAllBtnMobile.addEventListener("click", onFilterClearAllClick);
   }
   if (filterOnlySelectedCb) {
     filterOnlySelectedCb.addEventListener("change", function () {

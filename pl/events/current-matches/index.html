@@ -161,15 +161,6 @@
                 </div>
               </div>
               <div class="mm-filter-toolbar-row__actions">
-                <button
-                  type="button"
-                  class="mm-filter-toolbar-btn"
-                  id="mm-filter-clear-all-btn"
-                  title="Clear Filter: clear checkboxes (fights tab: only athletes on this event are removed from URL)."
-                  aria-label="Clear Filter — clear checkboxes on list"
-                >
-                  Clear Filter
-                </button>
                 <label class="mm-filter-only-selected">
                   <input
                     type="checkbox"
@@ -194,15 +185,26 @@
               aria-live="polite"
             ></p>
             <div class="mm-filter-sticky mm-filter-sticky--desktop">
-              <button
-                type="button"
-                class="mm-filter-apply-btn"
-                id="mm-filter-apply-sticky"
-                title="Apply Filter: save selection to URL and refresh."
-                aria-label="Apply Filter — save selection to URL and refresh"
-              >
-                Apply Filter
-              </button>
+              <div class="mm-filter-actions-row">
+                <button
+                  type="button"
+                  class="mm-filter-clear-action-btn"
+                  id="mm-filter-clear-all-btn"
+                  title="Clear Filter: clear checkboxes (fights tab: only athletes on this event are removed from URL)."
+                  aria-label="Clear Filter — clear checkboxes on list"
+                >
+                  Clear Filter
+                </button>
+                <button
+                  type="button"
+                  class="mm-filter-apply-btn"
+                  id="mm-filter-apply-sticky"
+                  title="Apply Filter: save selection to URL and refresh."
+                  aria-label="Apply Filter — save selection to URL and refresh"
+                >
+                  Apply Filter
+                </button>
+              </div>
             </div>
             <div id="mm-filter-list-root" class="mm-filter-list-root"></div>
           </div>
@@ -212,15 +214,26 @@
           class="mm-filter-mobile-bar is-hidden"
           aria-hidden="true"
         >
-          <button
-            type="button"
-            class="mm-filter-apply-btn"
-            id="mm-filter-apply-mobile"
-            title="Apply Filter: save selection to URL and refresh."
-            aria-label="Apply Filter — save selection to URL and refresh"
-          >
-            Apply Filter
-          </button>
+          <div class="mm-filter-actions-row">
+            <button
+              type="button"
+              class="mm-filter-clear-action-btn"
+              id="mm-filter-clear-all-btn-mobile"
+              title="Clear Filter: clear checkboxes (fights tab: only athletes on this event are removed from URL)."
+              aria-label="Clear Filter — clear checkboxes on list"
+            >
+              Clear Filter
+            </button>
+            <button
+              type="button"
+              class="mm-filter-apply-btn"
+              id="mm-filter-apply-mobile"
+              title="Apply Filter: save selection to URL and refresh."
+              aria-label="Apply Filter — save selection to URL and refresh"
+            >
+              Apply Filter
+            </button>
+          </div>
         </div>
       </div>
       <div
