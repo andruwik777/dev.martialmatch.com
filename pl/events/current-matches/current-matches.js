@@ -2282,18 +2282,6 @@
     }
   }
 
-  function clearAllMemberFilterCheckboxes() {
-    if (!filterListRootEl) return;
-    var boxes = filterListRootEl.querySelectorAll(
-      'input[type="checkbox"][data-mm-filter-member]'
-    );
-    for (var i = 0; i < boxes.length; i++) {
-      boxes[i].checked = false;
-    }
-    refreshAllClubHeaderCheckboxes();
-    applyFilterPanelListVisibility();
-  }
-
   function onFilterListCheckboxChange(ev) {
     var t = ev.target;
     if (!t || t.type !== "checkbox" || !filterListRootEl) return;
@@ -2616,15 +2604,9 @@
     return order;
   }
 
-  function applyFilterFromPanel() {
-    var ids = collectCheckedPublicIds();
-    if (getCmTabFromUrl() === CM_TAB_EVENTS) {
-      setEventsFilterQueryInUrl(ids);
-    } else {
-      setSlugFilterQueryInUrl(ids);
-    }
+  function closeFilterPanelAndRefreshViews(tab) {
     closeFilterPanel();
-    if (getCmTabFromUrl() === CM_TAB_EVENTS) {
+    if (tab === CM_TAB_EVENTS) {
       refreshEventsListVisibility();
     } else {
       if (lastFightsData) {
@@ -2632,6 +2614,52 @@
       }
       refreshHarmonogram();
     }
+  }
+
+  function applyFilterFromPanel() {
+    var tab = getCmTabFromUrl();
+    var ids = collectCheckedPublicIds();
+    if (tab === CM_TAB_EVENTS) {
+      setEventsFilterQueryInUrl(ids);
+    } else {
+      setSlugFilterQueryInUrl(ids);
+    }
+    closeFilterPanelAndRefreshViews(tab);
+  }
+
+  /**
+   * Clear filter URL for current tab (fights: only removes IDs on this event's list
+   * when applicable), sync checkboxes, close panel — same outcome as Apply with none selected.
+   */
+  function applyFilterClearFromPanel() {
+    var tab = getCmTabFromUrl();
+    if (
+      (tab === CM_TAB_FIGHTS || tab === CM_TAB_HARMONOGRAM) &&
+      evSlug &&
+      startingListEntries &&
+      startingListEntries.length
+    ) {
+      var inEvent = Object.create(null);
+      for (var ci = 0; ci < startingListEntries.length; ci++) {
+        inEvent[startingListEntries[ci].publicId] = true;
+      }
+      var urlSet = getSlugFilterIdSetFromUrl();
+      if (urlSet) {
+        var remaining = [];
+        for (var k in urlSet) {
+          if (!inEvent[k]) remaining.push(k);
+        }
+        setSlugFilterQueryInUrl(remaining);
+      } else {
+        setSlugFilterQueryInUrl([]);
+      }
+    } else if (tab === CM_TAB_EVENTS) {
+      setEventsFilterQueryInUrl([]);
+    } else {
+      setSlugFilterQueryInUrl([]);
+    }
+    syncFilterCheckboxesFromUrl();
+    closeFilterPanelAndRefreshViews(tab);
   }
 
   function fetchHtml(path) {
@@ -2988,40 +3016,11 @@
     filterListRootEl.addEventListener("change", onFilterListCheckboxChange);
   }
 
-  function onFilterClearAllClick() {
-    var tab = getCmTabFromUrl();
-    if (
-      (tab === CM_TAB_FIGHTS || tab === CM_TAB_HARMONOGRAM) &&
-      evSlug &&
-      startingListEntries &&
-      startingListEntries.length
-    ) {
-      var inEvent = Object.create(null);
-      for (var ci = 0; ci < startingListEntries.length; ci++) {
-        inEvent[startingListEntries[ci].publicId] = true;
-      }
-      var urlSet = getSlugFilterIdSetFromUrl();
-      if (urlSet) {
-        var remaining = [];
-        for (var k in urlSet) {
-          if (!inEvent[k]) remaining.push(k);
-        }
-        setSlugFilterQueryInUrl(remaining);
-      }
-      syncFilterCheckboxesFromUrl();
-      if (lastFightsData) renderFights(lastFightsData);
-      refreshHarmonogram();
-      applyFilterPanelListVisibility();
-      return;
-    }
-    clearAllMemberFilterCheckboxes();
-  }
-
   if (filterClearAllBtn) {
-    filterClearAllBtn.addEventListener("click", onFilterClearAllClick);
+    filterClearAllBtn.addEventListener("click", applyFilterClearFromPanel);
   }
   if (filterClearAllBtnMobile) {
-    filterClearAllBtnMobile.addEventListener("click", onFilterClearAllClick);
+    filterClearAllBtnMobile.addEventListener("click", applyFilterClearFromPanel);
   }
   if (filterOnlySelectedCb) {
     filterOnlySelectedCb.addEventListener("change", function () {
