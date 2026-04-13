@@ -2499,13 +2499,13 @@
       var lab = btn.querySelector(".mm-filter-main-btn__label");
       btn.setAttribute("aria-expanded", filterPanelOpen ? "true" : "false");
       if (filterPanelOpen) {
-        if (lab) lab.textContent = "Hide";
+        if (lab) lab.textContent = "Hide Filter";
         btn.setAttribute(
           "aria-label",
-          "Collapse filter panel without applying changes — use Apply Filter to save."
+          "Hide Filter — collapse panel without applying; use Apply Filter to save."
         );
         btn.title =
-          "Collapse without applying: list and schedule stay as last Apply Filter.";
+          "Hide Filter: closes without saving. List and schedule stay as after last Apply Filter.";
         continue;
       }
       if (lab) {
