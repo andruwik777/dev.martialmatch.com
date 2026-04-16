@@ -702,7 +702,7 @@ body {
   outline: none;
 }
 
-/* Header active event: same column as .main; thumb + title + lane dots only */
+/* Header active event: thumb + title + date (same row markup as list) + lane dots */
 .mm-event-row.mm-event-row--header-compact {
   align-items: center;
   padding-top: 0.5rem;

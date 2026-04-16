@@ -1126,21 +1126,21 @@
     titleEl.textContent = ev.title || "Event " + ev.numericId;
     body.appendChild(titleEl);
 
-    if (!headerCompact) {
-      if (ev.dateText) {
-        var dateRow = document.createElement("div");
-        dateRow.className = "mm-ev-date";
-        var lab = document.createElement("span");
-        lab.className = "mm-ev-date__label";
-        lab.textContent = "Date:";
-        var val = document.createElement("span");
-        val.className = "mm-ev-date__value";
-        val.textContent = " " + ev.dateText;
-        dateRow.appendChild(lab);
-        dateRow.appendChild(val);
-        body.appendChild(dateRow);
-      }
+    if (ev.dateText) {
+      var dateRow = document.createElement("div");
+      dateRow.className = "mm-ev-date";
+      var lab = document.createElement("span");
+      lab.className = "mm-ev-date__label";
+      lab.textContent = "Date:";
+      var val = document.createElement("span");
+      val.className = "mm-ev-date__value";
+      val.textContent = " " + ev.dateText;
+      dateRow.appendChild(lab);
+      dateRow.appendChild(val);
+      body.appendChild(dateRow);
+    }
 
+    if (!headerCompact) {
       if (ev.registration) {
         var regEl = document.createElement("div");
         regEl.className = "mm-ev-reg mm-ev-reg--" + ev.registration.kind;
