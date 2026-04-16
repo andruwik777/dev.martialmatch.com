@@ -546,6 +546,42 @@ body {
   flex: 2 1 0;
 }
 
+.mm-cm-tab__label {
+  display: block;
+  min-width: 0;
+}
+
+.mm-cm-tab.mm-cm-lane-badge-host {
+  position: relative;
+  padding-right: 1.15rem;
+}
+
+.mm-cm-lane-badge-wrap {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.25rem;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  pointer-events: none;
+}
+
+.mm-cm-lane-badge-wrap.is-hidden {
+  display: none !important;
+}
+
+.mm-filter-main-btn.mm-cm-lane-badge-host {
+  position: relative;
+}
+
+.mm-filter-main-btn.mm-cm-lane-badge-host .mm-cm-lane-badge-wrap {
+  top: 0.35rem;
+  right: 2.35rem;
+}
+
 .mm-cm-tab {
   min-width: 0;
   padding: 0.5rem 0.6rem;

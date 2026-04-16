@@ -37,6 +37,7 @@
   var tabEventsBtn = document.getElementById("mm-cm-tab-events");
   var tabFightsBtn = document.getElementById("mm-cm-tab-fights");
   var tabHarmonogramBtn = document.getElementById("mm-cm-tab-harmonogram");
+  var tabFightsLabelEl = document.getElementById("mm-cm-tab-fights-label");
   var panelEventsEl = document.getElementById("mm-cm-panel-events");
   var panelFightsEl = document.getElementById("mm-cm-panel-fights");
   var panelHarmonogramEl = document.getElementById("mm-cm-panel-harmonogram");
@@ -1061,6 +1062,110 @@
         if (hw) paintEventCardLaneStrip(hw, idStr);
       }
     }
+    refreshCmToolbarLaneBadges();
+  }
+
+  function ensureTabLaneBadgeWrap(btn) {
+    if (!btn) return null;
+    var w = btn.querySelector(".mm-cm-lane-badge-wrap");
+    if (!w) {
+      btn.classList.add("mm-cm-lane-badge-host");
+      w = document.createElement("span");
+      w.className = "mm-cm-lane-badge-wrap is-hidden";
+      w.setAttribute("aria-hidden", "true");
+      var dot = document.createElement("span");
+      dot.className = "mm-event-lane";
+      w.appendChild(dot);
+      btn.appendChild(w);
+    }
+    return w;
+  }
+
+  function paintTabLaneBadgeWrap(wrap, lane, mod, labels) {
+    if (!wrap) return;
+    var dot = wrap.querySelector(".mm-event-lane");
+    if (!dot) return;
+    if (lane == null) {
+      wrap.classList.add("is-hidden");
+      dot.removeAttribute("title");
+      return;
+    }
+    wrap.classList.remove("is-hidden");
+    if (lane.error) {
+      dot.className =
+        "mm-event-lane mm-event-lane--" + mod + " mm-event-lane--error";
+      var st = lane.status;
+      dot.setAttribute(
+        "title",
+        st
+          ? labels.tErr + " (HTTP " + st + ")."
+          : labels.tErr + " (network or unknown error)."
+      );
+    } else {
+      dot.className =
+        "mm-event-lane mm-event-lane--" +
+        mod +
+        (lane.has ? " mm-event-lane--filled" : " mm-event-lane--outline");
+      dot.setAttribute("title", lane.has ? labels.tFill : labels.tOut);
+    }
+  }
+
+  function hideTabLaneBadgeWrap(btn) {
+    var w = btn && btn.querySelector(".mm-cm-lane-badge-wrap");
+    if (w) {
+      w.classList.add("is-hidden");
+      var d = w.querySelector(".mm-event-lane");
+      if (d) d.removeAttribute("title");
+    }
+  }
+
+  /**
+   * On Fights / Harmonogram tabs only: lane dots on Filter (starting),
+   * Schedule tab (schedules), Fights tab (fights) — same semantics as event cards.
+   */
+  function refreshCmToolbarLaneBadges() {
+    var tab = getCmTabFromUrl();
+    var onFH = tab === CM_TAB_FIGHTS || tab === CM_TAB_HARMONOGRAM;
+    var c =
+      onFH && evSlug && eventNumericId
+        ? eventCache[eventNumericId]
+        : null;
+    if (!onFH || !c) {
+      hideTabLaneBadgeWrap(filterMainBtn);
+      hideTabLaneBadgeWrap(tabFightsBtn);
+      hideTabLaneBadgeWrap(tabHarmonogramBtn);
+      return;
+    }
+    paintTabLaneBadgeWrap(
+      ensureTabLaneBadgeWrap(filterMainBtn),
+      c.laneStarting,
+      "starting",
+      {
+        tFill: "Starting list: athletes present.",
+        tOut: "Starting list: no athletes (server response).",
+        tErr: "Starting list: request failed",
+      }
+    );
+    paintTabLaneBadgeWrap(
+      ensureTabLaneBadgeWrap(tabHarmonogramBtn),
+      c.laneSchedules,
+      "schedules",
+      {
+        tFill: "Schedule: API returned schedules.",
+        tOut: "Schedule: API returned no schedules.",
+        tErr: "Schedule: request failed",
+      }
+    );
+    paintTabLaneBadgeWrap(
+      ensureTabLaneBadgeWrap(tabFightsBtn),
+      c.laneFights,
+      "fights",
+      {
+        tFill: "Fights: API returned at least one fight.",
+        tOut: "Fights: API returned no fights.",
+        tErr: "Fights: request failed",
+      }
+    );
   }
 
   function buildEventThumbPlaceholder() {
@@ -1451,8 +1556,10 @@
   function updateFightsTabLabel() {
     if (!tabFightsBtn) return;
     if (!evSlug || tabFightsBtn.disabled) {
-      tabFightsBtn.textContent = "Fights";
+      if (tabFightsLabelEl) tabFightsLabelEl.textContent = "Fights";
+      else tabFightsBtn.textContent = "Fights";
       tabFightsBtn.setAttribute("aria-label", "Fights tab");
+      refreshCmToolbarLaneBadges();
       return;
     }
     var s = fightsTabStats.shown;
@@ -1465,7 +1572,8 @@
         ? " (" + fightsTabSecondsLeft + "s)"
         : "";
     var body = filtered ? "Fights " + s + "/" + t : "Fights " + t;
-    tabFightsBtn.textContent = body + parens;
+    if (tabFightsLabelEl) tabFightsLabelEl.textContent = body + parens;
+    else tabFightsBtn.textContent = body + parens;
     var aria = filtered
       ? "Fights tab, " + s + " of " + t + " fights match filter"
       : "Fights tab, " + t + " fights";
@@ -1473,6 +1581,7 @@
       aria += ", next refresh in " + fightsTabSecondsLeft + " seconds";
     }
     tabFightsBtn.setAttribute("aria-label", aria);
+    refreshCmToolbarLaneBadges();
   }
 
   function updateFilterRootVisibility() {
@@ -1909,6 +2018,7 @@
       refreshHarmonogram();
     }
     updatePollingForTab();
+    refreshCmToolbarLaneBadges();
   }
 
   function setCmTab(tab) {
