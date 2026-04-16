@@ -1,23 +1,23 @@
-/** Edge cache TTL for cached proxy routes (seconds). */
-const EDGE_CACHE_MAX_AGE = 3600;
-/** Same TTL for browser HTTP cache on client responses (HIT/MISS 200), when USE_CLIENT_CACHE. */
-const BROWSER_CACHE_CONTROL = "public, max-age=" + EDGE_CACHE_MAX_AGE;
-
 /**
  * Use Worker Cache API (match/put) for cached routes. Set false to always hit origin (debug).
  */
 const USE_SERVER_CACHE = true;
 
 /**
+ * When true, 200 responses from edge-cached routes include Cache-Control for the browser.
+ */
+const USE_CLIENT_CACHE = true;
+
+/** Edge cache TTL for cached proxy routes (seconds). */
+const EDGE_CACHE_MAX_AGE = 3600;
+/** Same TTL for browser HTTP cache on client responses (HIT/MISS 200), when USE_CLIENT_CACHE. */
+const BROWSER_CACHE_CONTROL = "public, max-age=" + EDGE_CACHE_MAX_AGE;
+
+/**
  * Logical cache reset: non-empty value adds ?_wcb=… only to the Cache API key URL (origin fetch
  * URLs are unchanged). Default "" = same key as before (worker request URL only).
  */
 const CACHE_KEY_BUMP = "";
-
-/**
- * When true, 200 responses from edge-cached routes include Cache-Control for the browser.
- */
-const USE_CLIENT_CACHE = true;
 
 function corsHeaders(allowOrigin, extra) {
   const h = Object.assign({ Vary: "Origin" }, extra || {});
