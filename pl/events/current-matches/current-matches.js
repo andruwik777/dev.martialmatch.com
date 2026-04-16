@@ -260,21 +260,15 @@
   function buildMatMapFromSchedules(payload) {
     var map = Object.create(null);
     if (!payload || typeof payload !== "object") return map;
-    var activeId = payload.activeScheduleId;
     var schedules = payload.schedules || [];
-    var sch = null;
-    for (var i = 0; i < schedules.length; i++) {
-      if (schedules[i].id === activeId) {
-        sch = schedules[i];
-        break;
-      }
+    for (var si = 0; si < schedules.length; si++) {
+      var sch = schedules[si];
+      if (!sch || !sch.mats) continue;
+      sch.mats.forEach(function (m) {
+        var id = m.id;
+        map[String(id)] = m.name || "Mat " + id;
+      });
     }
-    if (!sch && schedules.length) sch = schedules[0];
-    if (!sch || !sch.mats) return map;
-    sch.mats.forEach(function (m) {
-      var id = m.id;
-      map[String(id)] = m.name || "Mat " + id;
-    });
     return map;
   }
 
@@ -288,41 +282,39 @@
 
   /**
    * @param {object} payload
-   * @returns {Record<string, {categoryId:number,categoryName:string,matId:number,matNameRaw:string,start:string,end:string}>}
+   * @returns {Record<string, {categoryId:number,categoryName:string,matId:number,matNameRaw:string,start:string,end:string,scheduleId:number,scheduleName:string}>}
    */
   function buildCategoryScheduleIndex(payload) {
     var map = Object.create(null);
     if (!payload || typeof payload !== "object") return map;
-    var activeId = payload.activeScheduleId;
     var schedules = payload.schedules || [];
-    var sch = null;
-    for (var i = 0; i < schedules.length; i++) {
-      if (schedules[i].id === activeId) {
-        sch = schedules[i];
-        break;
-      }
-    }
-    if (!sch && schedules.length) sch = schedules[0];
-    if (!sch || !sch.mats) return map;
-    sch.mats.forEach(function (m) {
-      var matId = m.id;
-      var matNameRaw = m.name || "Mat " + matId;
-      var cats = m.categories || [];
-      cats.forEach(function (c) {
-        var id = c.id;
-        if (id == null) return;
-        var key = String(id);
-        var t = c.scheduledCategoryTime || {};
-        map[key] = {
-          categoryId: id,
-          categoryName: c.name || "",
-          matId: matId,
-          matNameRaw: matNameRaw,
-          start: t.start || "",
-          end: t.end || "",
-        };
+    for (var si = 0; si < schedules.length; si++) {
+      var sch = schedules[si];
+      if (!sch || !sch.mats) continue;
+      var scheduleId = sch.id;
+      var scheduleName = sch.name != null ? String(sch.name) : "";
+      sch.mats.forEach(function (m) {
+        var matId = m.id;
+        var matNameRaw = m.name || "Mat " + matId;
+        var cats = m.categories || [];
+        cats.forEach(function (c) {
+          var id = c.id;
+          if (id == null) return;
+          var key = String(id);
+          var t = c.scheduledCategoryTime || {};
+          map[key] = {
+            categoryId: id,
+            categoryName: c.name || "",
+            matId: matId,
+            matNameRaw: matNameRaw,
+            start: t.start || "",
+            end: t.end || "",
+            scheduleId: scheduleId,
+            scheduleName: scheduleName,
+          };
+        });
       });
-    });
+    }
     return map;
   }
 
@@ -473,8 +465,29 @@
 
     var wrap = document.createElement("div");
     wrap.className = "mm-hg-list";
+    var multiDay =
+      Array.isArray(lastSchedulesPayload.schedules) &&
+      lastSchedulesPayload.schedules.length > 1;
+    var prevScheduleKey = null;
     for (var r = 0; r < rows.length; r++) {
-      wrap.appendChild(buildHarmonogramCard(rows[r]));
+      var row = rows[r];
+      var slot = row.slot;
+      if (multiDay) {
+        var sk =
+          slot.scheduleId != null ? String(slot.scheduleId) : "__none__";
+        if (sk !== prevScheduleKey) {
+          prevScheduleKey = sk;
+          var head = document.createElement("div");
+          head.className = "mm-hg-day-heading";
+          head.setAttribute("role", "heading");
+          head.setAttribute("aria-level", "3");
+          head.textContent =
+            (slot.scheduleName && String(slot.scheduleName).trim()) ||
+            "Schedule";
+          wrap.appendChild(head);
+        }
+      }
+      wrap.appendChild(buildHarmonogramCard(row));
     }
     harmonogramRootEl.appendChild(wrap);
   }

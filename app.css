@@ -783,6 +783,23 @@ body {
   gap: 0.65rem;
 }
 
+.mm-hg-day-heading {
+  margin: 0.35rem 0 0.1rem;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #e2e8f0;
+  background: linear-gradient(90deg, #1a365d 0%, #2c5282 55%, transparent 100%);
+  border-left: 3px solid #63b3ed;
+  border-radius: 6px;
+}
+
+.mm-hg-list > .mm-hg-day-heading:first-child {
+  margin-top: 0;
+}
+
 .mm-hg-card {
   border: 1px solid #2d3748;
   border-radius: 10px;
