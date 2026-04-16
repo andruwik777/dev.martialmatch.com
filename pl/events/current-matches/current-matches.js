@@ -1745,6 +1745,15 @@
       });
   }
 
+  /** Progress text for loading all events' starting lists belongs on Events tab only. */
+  function shouldShowEventsAggregateFilterStatus() {
+    return (
+      filterPanelOpen &&
+      filterPanelStatusEl &&
+      getCmTabFromUrl() === CM_TAB_EVENTS
+    );
+  }
+
   function ensureAggregateParticipantMaps() {
     if (aggregateParticipantMapsPromise) {
       return aggregateParticipantMapsPromise;
@@ -1771,7 +1780,7 @@
     for (var idx = 0; idx < n; idx++) {
       (function (ev, i) {
         chain = chain.then(function () {
-          if (filterPanelOpen && filterPanelStatusEl) {
+          if (shouldShowEventsAggregateFilterStatus()) {
             filterPanelStatusEl.textContent =
               "Starting lists: " + (i + 1) + " / " + n + "…";
           }
@@ -1804,7 +1813,7 @@
       })(list[idx], idx);
     }
     aggregateParticipantMapsPromise = chain.then(function () {
-      if (filterPanelOpen && filterPanelStatusEl) {
+      if (shouldShowEventsAggregateFilterStatus()) {
         filterPanelStatusEl.textContent = "";
       }
     });
@@ -2702,12 +2711,20 @@
       return Promise.resolve(startingListEntries);
     }
     if (startingListLoadPromise) {
-      if (filterPanelOpen && filterPanelStatusEl) {
+      if (
+        filterPanelOpen &&
+        filterPanelStatusEl &&
+        getCmTabFromUrl() !== CM_TAB_EVENTS
+      ) {
         filterPanelStatusEl.textContent = "Loading starting lists…";
       }
       return startingListLoadPromise;
     }
-    if (filterPanelOpen && filterPanelStatusEl) {
+    if (
+      filterPanelOpen &&
+      filterPanelStatusEl &&
+      getCmTabFromUrl() !== CM_TAB_EVENTS
+    ) {
       filterPanelStatusEl.textContent = "Loading starting lists…";
     }
     startingListLoadPromise = fetchHtml(startingListsPath(evSlug.slug))
