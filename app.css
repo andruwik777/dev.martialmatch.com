@@ -1214,6 +1214,26 @@ body {
   margin: 0;
 }
 
+.mm-filter-panel-hint {
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: #a0aec0;
+}
+
+.mm-filter-panel-hint.is-hidden {
+  display: none;
+}
+
+/* Events tab: while all starting lists load, only progress + hint (no list / apply). */
+.mm-cm-filter.mm-cm-filter--aggregate-loading .mm-filter-panel-body {
+  display: none !important;
+}
+
+.mm-cm-filter.mm-cm-filter--aggregate-loading .mm-filter-mobile-bar {
+  display: none !important;
+}
+
 .mm-filter-search-wrap {
   margin: 0 0 0.5rem;
 }

@@ -71,6 +71,7 @@
   var filterMainBtn = document.getElementById("mm-filter-main-btn");
   var filterPanelEl = document.getElementById("mm-filter-panel");
   var filterPanelStatusEl = document.getElementById("mm-filter-panel-status");
+  var filterPanelHintEl = document.getElementById("mm-filter-panel-hint");
   var filterListRootEl = document.getElementById("mm-filter-list-root");
   var filterApplyStickyBtn = document.getElementById("mm-filter-apply-sticky");
   var filterMobileBarEl = document.getElementById("mm-filter-mobile-bar");
@@ -1754,6 +1755,38 @@
     );
   }
 
+  var AGGREGATE_FILTER_LOAD_HINT =
+    "The athlete list and Apply / Clear actions will appear when every event's starting list has finished loading.";
+
+  /**
+   * While true, Events-tab aggregate load hides list, search, and apply/clear (see app.css).
+   */
+  function setEventsAggregateFilterLoadingUi(active) {
+    if (filterRootEl) {
+      filterRootEl.classList.toggle(
+        "mm-cm-filter--aggregate-loading",
+        !!active
+      );
+    }
+    if (filterPanelEl) {
+      filterPanelEl.setAttribute("aria-busy", active ? "true" : "false");
+    }
+    if (filterPanelHintEl) {
+      filterPanelHintEl.classList.toggle("is-hidden", !active);
+      if (active) {
+        filterPanelHintEl.textContent = AGGREGATE_FILTER_LOAD_HINT;
+      } else {
+        filterPanelHintEl.textContent = "";
+      }
+    }
+    if (!active && filterPanelOpen) {
+      setFilterMobileBarVisible(true);
+    }
+    if (active && filterPanelOpen) {
+      setFilterMobileBarVisible(false);
+    }
+  }
+
   function ensureAggregateParticipantMaps() {
     if (aggregateParticipantMapsPromise) {
       return aggregateParticipantMapsPromise;
@@ -2596,6 +2629,7 @@
 
   function closeFilterPanel() {
     filterPanelOpen = false;
+    setEventsAggregateFilterLoadingUi(false);
     closeClubJumpDropdown();
     setFilterMobileBarVisible(false);
     if (filterRootEl) {
@@ -2756,11 +2790,15 @@
 
   function onFilterPanelOpenRequest() {
     if (getCmTabFromUrl() === CM_TAB_EVENTS) {
+      if (filterListRootEl) filterListRootEl.innerHTML = "";
+      hideClubJumpUI();
+      setEventsAggregateFilterLoadingUi(true);
       if (filterPanelStatusEl) {
         filterPanelStatusEl.textContent = "Loading all lists…";
       }
       ensureAggregateParticipantMaps()
         .then(function () {
+          setEventsAggregateFilterLoadingUi(false);
           if (filterPanelStatusEl) filterPanelStatusEl.textContent = "";
           var merged = buildAggregateFilterEntries();
           if (!merged.length) {
@@ -2770,6 +2808,7 @@
           syncFilterCheckboxesFromUrl();
         })
         .catch(function (err) {
+          setEventsAggregateFilterLoadingUi(false);
           if (filterPanelStatusEl) {
             filterPanelStatusEl.textContent =
               "Failed to load lists: " +
