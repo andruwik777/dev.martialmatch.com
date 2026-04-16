@@ -530,7 +530,7 @@ body {
   color: #edf2f7;
 }
 
-/* Current matches — zakładki (Przebieg / Harmonogram) */
+/* Current matches — trzy zakładki (Events / Fights / Harmonogram) */
 .mm-cm-tabs {
   display: flex;
   gap: 0.35rem;
@@ -562,7 +562,10 @@ body {
   transition:
     color 0.15s ease,
     background 0.15s ease,
-    border-color 0.15s ease;
+    border-color 0.15s ease,
+    transform 0.1s ease,
+    filter 0.1s ease,
+    box-shadow 0.1s ease;
 }
 
 .mm-cm-tab:hover {
@@ -576,6 +579,11 @@ body {
   background: #2a3248;
   border-color: #5b8cff;
   box-shadow: 0 0 0 1px rgba(91, 140, 255, 0.35);
+}
+
+.mm-cm-tab:active:not(:disabled) {
+  transform: scale(0.985);
+  filter: brightness(0.9);
 }
 
 .mm-cm-tab:focus-visible {
@@ -598,44 +606,6 @@ body {
   background: #252a38;
   border-color: #2d3548;
   color: #6b7280;
-}
-
-/* Fights — wyróżnienie (jak zielony pasek aktywnej walki) */
-.mm-cm-tab--fights {
-  color: #c6f6d5;
-  background: #1e3a2f;
-  border-color: #2f6f4e;
-}
-
-.mm-cm-tab--fights:hover:not(:disabled) {
-  color: #f0fff4;
-  background: #234836;
-  border-color: #38a169;
-}
-
-.mm-cm-tab--fights[aria-selected="true"] {
-  color: #f0fff4;
-  background: #276749;
-  border-color: #48bb78;
-  box-shadow:
-    0 0 0 1px rgba(72, 187, 120, 0.45),
-    0 0 12px rgba(39, 103, 73, 0.35);
-}
-
-.mm-cm-tab--fights.mm-cm-tab--disabled,
-.mm-cm-tab--fights:disabled {
-  opacity: 0.58;
-  color: #68a082;
-  background: #172924;
-  border-color: #234536;
-  box-shadow: none;
-}
-
-.mm-cm-tab--fights.mm-cm-tab--disabled:hover,
-.mm-cm-tab--fights:disabled:hover {
-  background: #172924;
-  border-color: #234536;
-  color: #68a082;
 }
 
 /* Current-matches: same column as .main (36rem), not full viewport */
