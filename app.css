@@ -411,8 +411,8 @@ body {
 
 .mm-ev-place {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+  align-items: flex-start;
+  flex-wrap: nowrap;
   gap: 0.3rem 0.4rem;
   margin: 0.35rem 0 0;
   font-size: 0.8125rem;
@@ -427,12 +427,16 @@ body {
 }
 
 .mm-ev-place__flag {
+  flex-shrink: 0;
   font-size: 1rem;
   line-height: 1;
 }
 
 .mm-ev-place__city {
+  flex: 1 1 0;
+  min-width: 0;
   color: #cbd5e0;
+  overflow-wrap: break-word;
 }
 
 .mm-ev-tags {
