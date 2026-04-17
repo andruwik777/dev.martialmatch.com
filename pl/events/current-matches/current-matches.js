@@ -2661,9 +2661,28 @@
     return base;
   }
 
+  /** Athletes on the active event starting list (denominator for filter button). */
+  function countStartingListSizeActiveEvent() {
+    if (!eventNumericId) return 0;
+    var c = eventCache[eventNumericId];
+    if (c && Array.isArray(c.startingListEntries)) {
+      return c.startingListEntries.length;
+    }
+    if (
+      evSlug &&
+      String(evSlug.numericId) === String(eventNumericId) &&
+      Array.isArray(startingListEntries)
+    ) {
+      return startingListEntries.length;
+    }
+    return 0;
+  }
+
   function filterLabelThisEventFighters(totalUrl, n) {
     if (!totalUrl) return "This Event Fighters · all";
-    return "This Event Fighters · " + n + " / " + totalUrl;
+    var pool = countStartingListSizeActiveEvent();
+    var denom = pool > 0 ? pool : totalUrl;
+    return "This Event Fighters · " + n + " / " + denom;
   }
 
   function updateFilterMainButtonLabel() {
@@ -2674,6 +2693,7 @@
     var tab = getCmTabFromUrl();
     var totalUrlEvents = countEventsFilterIdsInUrl();
     var totalUrlSlug = countSlugFilterIdsInUrl();
+    var poolActive = countStartingListSizeActiveEvent();
 
     for (var ti = 0; ti < triggers.length; ti++) {
       var btn = triggers[ti];
@@ -2715,7 +2735,15 @@
         btn.setAttribute(
           "aria-label",
           n > 0
-            ? "Open filter — for this event, " + n + " of " + totalUrlSlug + " from URL are active."
+            ? poolActive > 0
+              ? "Open filter — for this event, " +
+                n +
+                " of " +
+                poolActive +
+                " athletes on the starting list."
+              : "Open filter — for this event, " +
+                n +
+                " fighter(s) from URL match the starting list."
             : totalUrlSlug > 0
               ? "Open filter — URL has " +
                 totalUrlSlug +
@@ -2724,11 +2752,15 @@
         );
         btn.title =
           n > 0
-            ? "For this event, " +
-              n +
-              " of " +
-              totalUrlSlug +
-              " fighter(s) from URL match the starting list. Click to edit."
+            ? poolActive > 0
+              ? "For this event, " +
+                n +
+                " of " +
+                poolActive +
+                " on the starting list. Click to edit."
+              : "For this event, " +
+                n +
+                " fighter(s) from URL match the starting list. Click to edit."
             : totalUrlSlug > 0
               ? "URL has " +
                 totalUrlSlug +
