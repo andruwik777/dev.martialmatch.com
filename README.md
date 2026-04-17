@@ -181,15 +181,27 @@ Work in the **dev** repo clone, on branch **`release`** (or create/update it fro
    git mv prod.css.example prod.css
    ```
 
-5. Commit with a release message, then create an **annotated or lightweight** tag with the same version (replace `v1.0.0` everywhere below):
+5. Replace **`README.md`** with a **short stub**: the prod repo only needs to publish **`release`** to GitHub Pages — it should not carry a second copy of the full dev README (that drifts and duplicates). Point readers at the dev repo instead:
 
    ```bash
-   git add config.js prod.css
+   printf '%s\n' \
+     '# martialmatch.com (release publish)' \
+     '' \
+     'This repository exists so the **`release`** branch is built as **GitHub Pages** for the stable site.' \
+     '' \
+     '**Development, documentation, and issues:** [github.com/andruwik777/dev.martialmatch.com](https://github.com/andruwik777/dev.martialmatch.com)' \
+     > README.md
+   ```
+
+6. Commit with a release message, then create an **annotated or lightweight** tag with the same version (replace `v1.0.0` everywhere below):
+
+   ```bash
+   git add config.js prod.css README.md
    git commit -m "Release v1.0.0"
    git tag v1.0.0
    ```
 
-6. Push the **current HEAD** to prod’s **`master`** and push the **tag** (tag name must match step 5):
+7. Push the **current HEAD** to prod’s **`master`** and push the **tag** (tag name must match step 6):
 
    ```bash
    git push origin_release HEAD:master
@@ -198,7 +210,7 @@ Work in the **dev** repo clone, on branch **`release`** (or create/update it fro
 
    This updates **[github.com/andruwik777/martialmatch.com](https://github.com/andruwik777/martialmatch.com)** `master` from your local `HEAD` and publishes the tag on **`origin_release`**.
 
-7. Return to daily work:
+8. Return to daily work:
 
    ```bash
    git checkout master
