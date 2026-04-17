@@ -2645,15 +2645,25 @@
     return n;
   }
 
-  function filterLabelEventsFightersCount(total) {
-    if (!total) return "All Fighters";
-    if (total === 1) return "1 Fighter";
-    return total + " Fighters";
+  /** Unique athletes in merged filter list (all events), 0 if none loaded yet. */
+  function countAggregateFilterPoolSize() {
+    return buildAggregateFilterEntries().length;
+  }
+
+  function filterLabelEventsFightersCount(totalSelected) {
+    if (!totalSelected) return "All Fighters";
+    var base =
+      totalSelected === 1 ? "1 Fighter" : totalSelected + " Fighters";
+    var pool = countAggregateFilterPoolSize();
+    if (pool > 0) {
+      return base + " from " + pool;
+    }
+    return base;
   }
 
   function filterLabelThisEventFighters(totalUrl, n) {
     if (!totalUrl) return "This Event Fighters · all";
-    return "This Event Fighters · " + n;
+    return "This Event Fighters · " + n + " / " + totalUrl;
   }
 
   function updateFilterMainButtonLabel() {
