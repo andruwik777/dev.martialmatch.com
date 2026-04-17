@@ -576,11 +576,6 @@ body {
   position: relative;
 }
 
-.mm-filter-main-btn.mm-cm-lane-badge-host .mm-cm-lane-badge-wrap {
-  top: 0.28rem;
-  right: 2.28rem;
-}
-
 .mm-cm-tab {
   min-width: 0;
   padding: 0.5rem 0.6rem;
