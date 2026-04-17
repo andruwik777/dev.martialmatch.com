@@ -19,6 +19,12 @@ const BROWSER_CACHE_CONTROL = "public, max-age=" + EDGE_CACHE_MAX_AGE;
  */
 const CACHE_KEY_BUMP = "";
 
+/** Origins allowed for CORS (request Origin must match exactly). */
+const ALLOWED_CORS_ORIGINS = [
+  "https://andruwik777.github.io",
+  "http://localhost:8080",
+];
+
 function corsHeaders(allowOrigin, extra) {
   const h = Object.assign({ Vary: "Origin" }, extra || {});
   if (allowOrigin) {
@@ -167,12 +173,7 @@ export default {
   async fetch(request) {
     const origin = request.headers.get("Origin");
 
-    const allowedOrigins = [
-      "https://andruwik777.github.io",
-      "http://localhost:8080",
-    ];
-
-    const allowOrigin = allowedOrigins.includes(origin) ? origin : null;
+    const allowOrigin = ALLOWED_CORS_ORIGINS.includes(origin) ? origin : null;
 
     const url = new URL(request.url);
     const path = url.pathname;
