@@ -2544,9 +2544,11 @@
   }
 
   function filterLabelEventsFightersCount(totalSelected) {
-    if (!totalSelected) return "All Fighters";
+    if (!totalSelected) return "All Participants";
     var base =
-      totalSelected === 1 ? "1 Fighter" : totalSelected + " Fighters";
+      totalSelected === 1
+        ? "1 Participant"
+        : totalSelected + " Participants";
     var pool = countAggregateFilterPoolSize();
     if (pool > 0) {
       return base + " from " + pool;
@@ -2572,10 +2574,10 @@
   }
 
   function filterLabelThisEventFighters(totalUrl, n) {
-    if (!totalUrl) return "This Event Fighters · all";
+    if (!totalUrl) return "This Event Participants · all";
     var pool = countStartingListSizeActiveEvent();
     var denom = pool > 0 ? pool : totalUrl;
-    return "This Event Fighters · " + n + " / " + denom;
+    return "This Event Participants · " + n + " / " + denom;
   }
 
   function updateFilterMainButtonLabel() {
@@ -2614,15 +2616,17 @@
         btn.setAttribute(
           "aria-label",
           n > 0
-            ? "Open filter — URL has " + n + " fighter(s) selected (all events)."
-            : "Open filter — none selected in URL; all fighters shown."
+            ? "Open filter — URL has " +
+              n +
+              " participant(s) selected (all events)."
+            : "Open filter — none selected in URL; all participants shown."
         );
         btn.title =
           n > 0
             ? "URL has " +
               n +
-              " fighter(s) across all events. Click to edit."
-            : "No filter in URL — all visible. Click to pick fighters.";
+              " participant(s) across all events. Click to edit."
+            : "No filter in URL — all visible. Click to pick participants.";
       } else {
         if (btn !== filterMainBtn) continue;
         btn.setAttribute(
@@ -2636,12 +2640,12 @@
                 " athletes on the starting list."
               : "Open filter — for this event, " +
                 n +
-                " fighter(s) from URL match the starting list."
+                " participant(s) from URL match the starting list."
             : totalUrlSlug > 0
               ? "Open filter — URL has " +
                 totalUrlSlug +
-                " fighter(s), none on this event's list."
-              : "Open filter — none in URL; all fighters shown."
+                " participant(s), none on this event's list."
+              : "Open filter — none in URL; all participants shown."
         );
         btn.title =
           n > 0
@@ -2653,12 +2657,12 @@
                 " on the starting list. Click to edit."
               : "For this event, " +
                 n +
-                " fighter(s) from URL match the starting list. Click to edit."
+                " participant(s) from URL match the starting list. Click to edit."
             : totalUrlSlug > 0
               ? "URL has " +
                 totalUrlSlug +
-                " fighter(s), but none are on this event's list."
-              : "No filter in URL — all visible. Click to pick fighters.";
+                " participant(s), but none are on this event's list."
+              : "No filter in URL — all visible. Click to pick participants.";
       }
     }
   }
