@@ -557,8 +557,8 @@ body {
 
 .mm-cm-lane-badge-wrap {
   position: absolute;
-  top: 0.2rem;
-  right: 0.25rem;
+  top: 0.125rem;
+  right: 0.2rem;
   z-index: 2;
   display: flex;
   align-items: center;
@@ -577,8 +577,8 @@ body {
 }
 
 .mm-filter-main-btn.mm-cm-lane-badge-host .mm-cm-lane-badge-wrap {
-  top: 0.35rem;
-  right: 2.35rem;
+  top: 0.28rem;
+  right: 2.28rem;
 }
 
 .mm-cm-tab {
