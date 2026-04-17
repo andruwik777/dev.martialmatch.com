@@ -10,7 +10,9 @@ This project is **not affiliated with** MartialMatch. Functionality depends on M
 
 A lightweight web front end for [MartialMatch](https://martialmatch.com) data, focused on **filtering by multiple athletes** and **shareable links**.
 
-**Live site (GitHub Pages):** [andruwik777.github.io/dev.martialmatch.com](https://andruwik777.github.io/dev.martialmatch.com)  
+**Live site (Stable):** [andruwik777.github.io/martialmatch.com](https://andruwik777.github.io/martialmatch.com)
+
+**Live site (Early access):** [andruwik777.github.io/dev.martialmatch.com](https://andruwik777.github.io/dev.martialmatch.com)  
 
 ## Why this exists
 
@@ -90,7 +92,7 @@ After changing fixtures, run the script, commit `data/`, push, then the test Wor
 2. **Bad CORS advice from ChatGPT ready-to-go solution** — A copy-paste suggestion along the lines of `const allowOrigin = allowedOrigins.includes(origin) ? origin : '*'` is **unsafe**: falling back to `*` (or reflecting arbitrary origins) breaks the point of an allowlist and can create a **cross-origin data leak**. Stick to **either** a matched allowed origin **or** no CORS header / deny.
 
 3. **Two public repos instead of fork** — GitHub does not let you fork your own repo into the same account in the usual way. **Approach:** keep **two** repositories and treat “release” as **merging** early work from dev into prod:
-   - **PROD (stable):** [github.com/andruwik777/martialmatch](https://github.com/andruwik777/martialmatch) → GitHub Pages e.g. `https://andruwik777.github.io/martialmatch/…`
+   - **PROD (stable):** [github.com/andruwik777/martialmatch.com](https://github.com/andruwik777/martialmatch.com) → GitHub Pages e.g. `https://andruwik777.github.io/martialmatch/…`
    - **DEV (early access):** [github.com/andruwik777/dev.martialmatch.com](https://github.com/andruwik777/dev.martialmatch.com) → `https://andruwik777.github.io/dev.martialmatch.com/…`
 
 4. **URL shape vs the official site** — Reuse the **same path** as the official site so you only swap the host: conceptually, prefix `https://andruwik777.github.io/` **before** the original host, so the path after it stays `…/pl/events/…`:
