@@ -154,23 +154,22 @@ Work in the **dev** repo clone, on branch **`release`** (or create/update it fro
 
 1. `git checkout release`
 2. `git merge master` (bring in latest dev work)
-3. Remove non-production paths under **`server/`** that must not ship in the prod repo (e.g. dev-only workers and large fixture trees—keep only what prod deploys and document your own rule here).
-4. Edit **`config.js`**: set **`BASE_BY_MODE`** **`prod`** and **`test`** URLs to the **released** Cloudflare Worker hostnames (align with folders you keep under **`server/`** and what you deployed).
-5. Rename **`prod.css.example`** → **`prod.css`** so the production site picks up the prod theme (see [Dev vs prod styling](#dev-vs-prod-styling-two-repos)).
-6. Commit, e.g. `Release v1.0.0`, then tag:
+3. Edit **`config.js`**: set **`BASE_BY_MODE`** **`prod`** and **`test`** URLs to the **released** Cloudflare Worker hostnames (align with folders you keep under **`server/`** and what you deployed).
+4. Rename **`prod.css.example`** → **`prod.css`** so the production site picks up the prod theme (see [Dev vs prod styling](#dev-vs-prod-styling-two-repos)).
+5. Commit, e.g. `Release v1.0.0`, then tag:
 
    ```bash
    git tag v1.0.0
    ```
 
-7. Push the **current HEAD** to prod’s **`master`** and push **tags**:
+6. Push the **current HEAD** to prod’s **`master`** and push **tags**:
 
    ```bash
    git push origin_release HEAD:master
    git push origin_release v1.0.0
    ```
 
-8. Return to daily work: `git checkout master`
+7. Return to daily work: `git checkout master`
 
 **Notes**
 
