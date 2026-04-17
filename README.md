@@ -216,6 +216,9 @@ Work in the **dev** repo clone, on branch **`release`** (or create/update it fro
    git checkout master
    ```
 
+9. **Cloudflare Worker (prod)** — easy to forget: **`git push` does not deploy the proxy.** After the release, copy the repo’s **`server/prod-martialmatch-v1/worker.js`** into the **`prod-martialmatch-v1`** Worker in the Cloudflare dashboard, then click **Deploy** so production matches what you ship in **`server/`**.  
+   Direct link (this project’s prod Worker → **Production**): [dash.cloudflare.com → prod-martialmatch-v1](https://dash.cloudflare.com/6b47963c94d644f8d9b7f1cf6f1405bd/workers/services/edit/prod-martialmatch-v1/production).
+
 **Notes**
 
 - **`origin_release`** is used for **every** push to the prod GitHub repo in this workflow; do not mix in `release_origin`.
