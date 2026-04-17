@@ -152,24 +152,57 @@ git branch -vv
 
 Work in the **dev** repo clone, on branch **`release`** (or create/update it from **`master`**).
 
-1. `git checkout release`
-2. `git merge master` (bring in latest dev work)
-3. Edit **`config.js`**: set **`BASE_BY_MODE`** **`prod`** and **`test`** URLs to the **released** Cloudflare Worker hostnames (align with folders you keep under **`server/`** and what you deployed).
-4. Rename **`prod.css.example`** → **`prod.css`** so the production site picks up the prod theme (see [Dev vs prod styling](#dev-vs-prod-styling-two-repos)).
-5. Commit, e.g. `Release v1.0.0`, then tag:
+1. Switch to the release branch:
 
    ```bash
+   git checkout release
+   ```
+
+2. Bring in the latest dev work:
+
+   ```bash
+   git merge master
+   ```
+
+3. Point **`config.js`** at the **prod** Cloudflare Worker URLs (substring replace only — indentation stays the same). Typical mapping for this project:
+
+   ```bash
+   sed -i 's|https://dev-martialmatch-v1.andruwik777.workers.dev|https://prod-martialmatch-v1.andruwik777.workers.dev|g' config.js
+   sed -i 's|https://dev-test-martialmatch-v1.andruwik777.workers.dev|https://prod-martialmatch-v1.andruwik777.workers.dev|g' config.js
+   ```
+
+   Uses **GNU** `sed -i` (Git Bash on Windows, Linux). On **macOS** use `sed -i ''` before the script on each line, e.g. `sed -i '' 's|…|…|g' config.js`.
+
+   Adjust hostnames if your deployed Workers use different names; keep them aligned with **`server/`** and what you actually deployed.
+
+4. Rename the prod theme file so GitHub Pages loads **`prod.css`** (see [Dev vs prod styling](#dev-vs-prod-styling-two-repos)):
+
+   ```bash
+   git mv prod.css.example prod.css
+   ```
+
+5. Commit with a release message, then create an **annotated or lightweight** tag with the same version (replace `v1.0.0` everywhere below):
+
+   ```bash
+   git add config.js prod.css
+   git commit -m "Release v1.0.0"
    git tag v1.0.0
    ```
 
-6. Push the **current HEAD** to prod’s **`master`** and push **tags**:
+6. Push the **current HEAD** to prod’s **`master`** and push the **tag** (tag name must match step 5):
 
    ```bash
    git push origin_release HEAD:master
    git push origin_release v1.0.0
    ```
 
-7. Return to daily work: `git checkout master`
+   This updates **[github.com/andruwik777/martialmatch.com](https://github.com/andruwik777/martialmatch.com)** `master` from your local `HEAD` and publishes the tag on **`origin_release`**.
+
+7. Return to daily work:
+
+   ```bash
+   git checkout master
+   ```
 
 **Notes**
 
