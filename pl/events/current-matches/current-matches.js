@@ -47,6 +47,12 @@
   var CM_TAB_FIGHTS = "fights";
   var CM_TAB_HARMONOGRAM = "harmonogram";
 
+  /** Shown when schedule/fights data is empty — short, no “API” jargon. */
+  var MSG_SCHEDULE_NOT_READY =
+    "Schedule isn't ready yet — organizers may still be preparing it.";
+  var MSG_FIGHTS_NOT_READY =
+    "Fight list isn't ready yet — organizers may still be preparing it.";
+
   var URL_PARAM_EVENTS_FILTER = "events_filter";
   var URL_PARAM_SLUG_FILTER = "slug_filter";
 
@@ -386,7 +392,7 @@
     if (!lastSchedulesPayload) {
       var p = document.createElement("p");
       p.className = "mm-muted";
-      p.textContent = "No schedule data from API.";
+      p.textContent = MSG_SCHEDULE_NOT_READY;
       harmonogramRootEl.appendChild(p);
       return;
     }
@@ -394,7 +400,7 @@
     if (!schedulesPayloadHasData(lastSchedulesPayload)) {
       var pSched = document.createElement("p");
       pSched.className = "mm-muted";
-      pSched.textContent = "No schedule slots in API response.";
+      pSched.textContent = MSG_SCHEDULE_NOT_READY;
       harmonogramRootEl.appendChild(pSched);
       return;
     }
@@ -3013,13 +3019,31 @@
     listEl.innerHTML = "";
 
     var idSet = getSlugFilterIdSetFromUrl();
-    var queue = data.fightQueueStatuses || {};
-    var allRows = (data.result || []).slice();
+    var queue = (data && data.fightQueueStatuses) || {};
+    var allRows = (
+      data && data.result && Array.isArray(data.result) ? data.result : []
+    ).slice();
     allRows.sort(function (a, b) {
       return (
         sortKeyStartTime(a.startTime) - sortKeyStartTime(b.startTime)
       );
     });
+
+    if (!allRows.length) {
+      var emptyF = document.createElement("p");
+      emptyF.className = "mm-muted";
+      emptyF.textContent = MSG_FIGHTS_NOT_READY;
+      listEl.appendChild(emptyF);
+      fightsTabStats.shown = 0;
+      fightsTabStats.total = 0;
+      fightsTabSecondsLeft = getFightsRefreshPeriodSec();
+      updateFightsTabLabel();
+      if (toolbarEl) {
+        toolbarEl.classList.add("is-hidden");
+        toolbarEl.textContent = "";
+      }
+      return;
+    }
 
     var rows = allRows.filter(function (row) {
       return fightMatchesFilter(row, idSet);
