@@ -161,8 +161,10 @@ Work in the **dev** repo clone, on branch **`release`** (or create/update it fro
 2. Bring in the latest dev work:
 
    ```bash
-   git merge master
+   git merge master -X theirs
    ```
+
+   While **`release`** is checked out, **`theirs`** is **`master`**: if Git reports conflicts, this merge strategy prefers **`master`**’s version of the conflicted hunks (release-only tweaks like **`prod.css`** / **`config.js`** you re-apply in the steps below).
 
 3. Point **`config.js`** at the **prod** Cloudflare Worker URLs (substring replace only — indentation stays the same). Typical mapping for this project:
 
