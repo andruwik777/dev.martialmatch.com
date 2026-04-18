@@ -1,10 +1,8 @@
 # MartialMatch viewer
 
-A lightweight web front end for [martialmatch.com](https://martialmatch.com) data, focused on **filtering by multiple athletes** and **shareable links**.
+A lightweight web front end for [martialmatch.com](https://martialmatch.com) data, focused on **filtering by multiple athletes** and **shareable links**. This helps the coach stay focused and keep track of the athletes he is interested in during a specific event, or simply lets you see which competitions your friends have registered for. Have fun! 🤼🥋🥊
 
 **Live site (Stable):** [andruwik777.github.io/martialmatch.com](https://andruwik777.github.io/martialmatch.com)
-
-**Live site (Early access):** [andruwik777.github.io/dev.martialmatch.com](https://andruwik777.github.io/dev.martialmatch.com)  
 
 <p align="center">
   <img src="./demo.gif" width="45%" style="display:inline-block; margin-right: 10px;"/>
