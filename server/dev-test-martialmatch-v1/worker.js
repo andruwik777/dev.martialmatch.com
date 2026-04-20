@@ -19,6 +19,7 @@ const NUMERIC_TO_SLUG = {
   707: "707-puchar-polski-poludniowej-adcc",
   723: "723-grand-prix-polski-combat-ju-jutsu-",
   703: "703-puchar-polski-seniorow-juniorow-i-juniorow-mlodszych-w-grappling",
+  798: "798-contender-let-splay-4-ggc8",
 };
 
 const ALLOWED_SLUGS = new Set(Object.values(NUMERIC_TO_SLUG));
