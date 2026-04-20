@@ -23,8 +23,11 @@ COMPETITOR = re.compile(
     r'<a class="competitor-name"[^>]*data-publicid="([^"]+)"[^>]*>\s*([^<]*?)\s*</a>',
     re.I | re.S,
 )
+# tail starts right after competitor-name </a>; next club cell is
+# </td> (close name column) then <td> (club). Do not use </a></td> — the first
+# </a> in tail is often the academy link, with branch text before </td>.
 NEXT_CLUB_TD = re.compile(
-    r"</a>\s*</td>\s*<td[^>]*>(.*?)</td>",
+    r"</td>\s*<td[^>]*>(.*?)</td>",
     re.I | re.S,
 )
 # Club cell: <a href="/pl/academies/9">Academia Gorila</a> / Warszawa
