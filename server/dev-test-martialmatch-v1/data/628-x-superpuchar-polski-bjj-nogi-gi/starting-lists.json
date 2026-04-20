@@ -11,7 +11,7 @@
           "firstName": "Franciszek",
           "lastName": "Brączkowski",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "AniMMAls Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -21,7 +21,7 @@
           "firstName": "Szymon",
           "lastName": "Gałka",
           "academy": "Copacabana Tarnów",
-          "academyId": 0,
+          "academyId": 1654,
           "branch": "Tarnów",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -47,7 +47,7 @@
           "firstName": "Daniel",
           "lastName": "Pycek",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -57,7 +57,7 @@
           "firstName": "Oleg",
           "lastName": "Szczerba",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Częstochowa",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -83,7 +83,7 @@
           "firstName": "Dominik",
           "lastName": "Krzyszczyk",
           "academy": "Academia Gorila",
-          "academyId": 0,
+          "academyId": 9,
           "branch": "Czerwionka-Leszczyny",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -93,7 +93,7 @@
           "firstName": "Aleksander",
           "lastName": "Witkiewicz",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -119,7 +119,7 @@
           "firstName": "Artur",
           "lastName": "Brączkowski",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Tarnowskie Góry",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -129,7 +129,7 @@
           "firstName": "Wojciech",
           "lastName": "Slota",
           "academy": "STOWARZYSZENIE SPORTÓW WALKI WALECZNA LUBELSZCZYZNA",
-          "academyId": 0,
+          "academyId": 2936,
           "branch": "Lublin",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -155,7 +155,7 @@
           "firstName": "Jakub",
           "lastName": "Moc",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Tarnowskie Góry",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -181,7 +181,7 @@
           "firstName": "Igor",
           "lastName": "Gajda",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Tarnowskie Góry",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -191,7 +191,7 @@
           "firstName": "Radosław",
           "lastName": "Stępniak",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Tarnowskie Góry",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -201,7 +201,7 @@
           "firstName": "Mikołaj",
           "lastName": "Wójcik",
           "academy": "Boi Team",
-          "academyId": 0,
+          "academyId": 4,
           "branch": "Strzelin",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -227,7 +227,7 @@
           "firstName": "Simon",
           "lastName": "Antoniewicz",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Tarnowskie Góry",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -237,7 +237,7 @@
           "firstName": "Seweryn",
           "lastName": "Walczak",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Tarnowskie Góry",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -247,7 +247,7 @@
           "firstName": "Olivier",
           "lastName": "Starzyk",
           "academy": "Grappling Kraków",
-          "academyId": 0,
+          "academyId": 26,
           "branch": "Kraków",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -257,7 +257,7 @@
           "firstName": "Marcel",
           "lastName": "Witusik",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -267,7 +267,7 @@
           "firstName": "Igor",
           "lastName": "Cieśla",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -277,7 +277,7 @@
           "firstName": "Grzegorz",
           "lastName": "Winiarski",
           "academy": "STOWARZYSZENIE SPORTÓW WALKI WALECZNA LUBELSZCZYZNA",
-          "academyId": 0,
+          "academyId": 2936,
           "branch": "Lublin",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -287,7 +287,7 @@
           "firstName": "Jakub",
           "lastName": "Suskiewicz",
           "academy": "STOWARZYSZENIE SPORTÓW WALKI WALECZNA LUBELSZCZYZNA",
-          "academyId": 0,
+          "academyId": 2936,
           "branch": "Lublin",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -297,7 +297,7 @@
           "firstName": "Dawid",
           "lastName": "Majcher",
           "academy": "TZN GRAPPLING CZĘSTOCHOWA",
-          "academyId": 0,
+          "academyId": 3583,
           "branch": "Częstochowa",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -323,7 +323,7 @@
           "firstName": "Sebastian",
           "lastName": "Potasiński",
           "academy": "Unia Jiu Jitsu",
-          "academyId": 0,
+          "academyId": 14,
           "branch": "Apeiron Częstochowa",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -333,7 +333,7 @@
           "firstName": "Artem",
           "lastName": "Vorona",
           "academy": "Natal Grind Team",
-          "academyId": 0,
+          "academyId": 1673,
           "branch": "Katowice",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -343,7 +343,7 @@
           "firstName": "Adam",
           "lastName": "Makuch",
           "academy": "Natal Grind Team",
-          "academyId": 0,
+          "academyId": 1673,
           "branch": "Katowice",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -353,7 +353,7 @@
           "firstName": "Adam",
           "lastName": "Frątczak",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -363,7 +363,7 @@
           "firstName": "Bartosz",
           "lastName": "Woźnicki",
           "academy": "Zenith Łódź",
-          "academyId": 0,
+          "academyId": 1003,
           "branch": "Łódź",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -389,7 +389,7 @@
           "firstName": "Kamil",
           "lastName": "Openchowski",
           "academy": "Next Level BJJ Wrocław",
-          "academyId": 0,
+          "academyId": 984,
           "branch": "Wrocław",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -399,7 +399,7 @@
           "firstName": "Andrzej",
           "lastName": "Książek",
           "academy": "STOWARZYSZENIE SPORTÓW WALKI WALECZNA LUBELSZCZYZNA",
-          "academyId": 0,
+          "academyId": 2936,
           "branch": "Lublin",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -409,7 +409,7 @@
           "firstName": "Michał",
           "lastName": "Warda",
           "academy": "OCTOPUS ŁÓDŹ",
-          "academyId": 0,
+          "academyId": 135,
           "branch": "Łódź",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -419,7 +419,7 @@
           "firstName": "Adrian",
           "lastName": "Szczech",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -429,7 +429,7 @@
           "firstName": "Paweł",
           "lastName": "Mazanek",
           "academy": "STOWARZYSZENIE SPORTÓW WALKI WALECZNA LUBELSZCZYZNA",
-          "academyId": 0,
+          "academyId": 2936,
           "branch": "Lublin",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -455,7 +455,7 @@
           "firstName": "Bartosz",
           "lastName": "Janicki",
           "academy": "Apeiron Częstochowa",
-          "academyId": 0,
+          "academyId": 3106,
           "branch": "Częstochowa",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -465,7 +465,7 @@
           "firstName": "Marek",
           "lastName": "Dąbrowski",
           "academy": "STOWARZYSZENIE SPORTÓW WALKI WALECZNA LUBELSZCZYZNA",
-          "academyId": 0,
+          "academyId": 2936,
           "branch": "Lublin",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -475,7 +475,7 @@
           "firstName": "Norbert",
           "lastName": "Żaba",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -501,7 +501,7 @@
           "firstName": "Kacper",
           "lastName": "Maślankiewicz",
           "academy": "Copacabana",
-          "academyId": 0,
+          "academyId": 5,
           "branch": "TZN Grappling Częstochowa",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -511,7 +511,7 @@
           "firstName": "Adrian",
           "lastName": "Misztal",
           "academy": "Favela",
-          "academyId": 0,
+          "academyId": 2905,
           "branch": "Jastrzębie Zdrój",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -537,7 +537,7 @@
           "firstName": "Mateusz",
           "lastName": "Tyrkiel",
           "academy": "STOWARZYSZENIE SPORTÓW WALKI WALECZNA LUBELSZCZYZNA",
-          "academyId": 0,
+          "academyId": 2936,
           "branch": "Lublin",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -547,7 +547,7 @@
           "firstName": "Mateusz",
           "lastName": "Minkiewicz",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Oława",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -557,7 +557,7 @@
           "firstName": "Mateusz",
           "lastName": "Pawłowski",
           "academy": "Spartan Chorzów",
-          "academyId": 0,
+          "academyId": 493,
           "branch": "Chorzów",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -583,7 +583,7 @@
           "firstName": "Mariusz",
           "lastName": "Magdziarczyk",
           "academy": "Natal Grind Team",
-          "academyId": 0,
+          "academyId": 1673,
           "branch": "Katowice",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -593,7 +593,7 @@
           "firstName": "Piotr",
           "lastName": "Wymysłowski",
           "academy": "Academia Gorila",
-          "academyId": 0,
+          "academyId": 9,
           "branch": "Czerwionka Leszczyny",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -619,7 +619,7 @@
           "firstName": "Kasjan",
           "lastName": "Włodarczyk",
           "academy": "Boi Team",
-          "academyId": 0,
+          "academyId": 4,
           "branch": "Strzelin",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -629,7 +629,7 @@
           "firstName": "Damian",
           "lastName": "Franaszczuk",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -639,7 +639,7 @@
           "firstName": "Leon",
           "lastName": "Kurczynski",
           "academy": "Warszawskie Centrum Atletyki",
-          "academyId": 0,
+          "academyId": 676,
           "branch": "Warszawa",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -665,7 +665,7 @@
           "firstName": "Bartosz",
           "lastName": "Tyrkiel",
           "academy": "Natal Grind Team",
-          "academyId": 0,
+          "academyId": 1673,
           "branch": "Katowice",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -691,7 +691,7 @@
           "firstName": "Patryk",
           "lastName": "Buczkowski",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -701,7 +701,7 @@
           "firstName": "Patryk",
           "lastName": "Szymczyk",
           "academy": "Boi Team",
-          "academyId": 0,
+          "academyId": 4,
           "branch": "Strzelin",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -727,7 +727,7 @@
           "firstName": "Maksymilian",
           "lastName": "Kowalski",
           "academy": "Next Level BJJ",
-          "academyId": 0,
+          "academyId": 10,
           "branch": "Wrocław",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -785,7 +785,7 @@
           "firstName": "Konrad",
           "lastName": "Skubiś",
           "academy": "Boi Team",
-          "academyId": 0,
+          "academyId": 4,
           "branch": "Strzelin",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -811,7 +811,7 @@
           "firstName": "Bartosz",
           "lastName": "Janicki",
           "academy": "Boi Team",
-          "academyId": 0,
+          "academyId": 4,
           "branch": "Strzelin",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -821,7 +821,7 @@
           "firstName": "Damian",
           "lastName": "Franaszczuk",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -831,7 +831,7 @@
           "firstName": "Leon",
           "lastName": "Kurczynski",
           "academy": "Academia Gorila",
-          "academyId": 0,
+          "academyId": 9,
           "branch": "Czerwionka Leszczyny",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -841,7 +841,7 @@
           "firstName": "Jakub",
           "lastName": "Banach",
           "academy": "Warszawskie Centrum Atletyki",
-          "academyId": 0,
+          "academyId": 676,
           "branch": "Warszawa",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -867,7 +867,7 @@
           "firstName": "Kamil",
           "lastName": "Kubasiak",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -877,7 +877,7 @@
           "firstName": "Łukasz",
           "lastName": "Gałka",
           "academy": "Next Level BJJ",
-          "academyId": 0,
+          "academyId": 10,
           "branch": "Wrocław",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -887,7 +887,7 @@
           "firstName": "Piotr",
           "lastName": "Banaszek",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -929,7 +929,7 @@
           "firstName": "Franciszek",
           "lastName": "Brączkowski",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "AniMMAls Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -939,7 +939,7 @@
           "firstName": "Szymon",
           "lastName": "Gałka",
           "academy": "Copacabana Tarnów",
-          "academyId": 0,
+          "academyId": 1654,
           "branch": "Tarnów",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -965,7 +965,7 @@
           "firstName": "Oliwia",
           "lastName": "Cieślak",
           "academy": "Roan Fight Club Mysłowice",
-          "academyId": 0,
+          "academyId": 636,
           "branch": "MYSŁOWICE",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1007,7 +1007,7 @@
           "firstName": "Oleg",
           "lastName": "Szczerba",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Częstochowa",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1033,7 +1033,7 @@
           "firstName": "Eryk",
           "lastName": "Winkler",
           "academy": "Academia Gorila",
-          "academyId": 0,
+          "academyId": 9,
           "branch": "Czerwionka-Leszczyny",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1043,7 +1043,7 @@
           "firstName": "Aleksander",
           "lastName": "Witkiewicz",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1069,7 +1069,7 @@
           "firstName": "Artur",
           "lastName": "Brączkowski",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Tarnowskie Góry",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1095,7 +1095,7 @@
           "firstName": "Jakub",
           "lastName": "Moc",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Tarnowskie Góry",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1121,7 +1121,7 @@
           "firstName": "Igor",
           "lastName": "Gajda",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Tarnowskie Góry",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1131,7 +1131,7 @@
           "firstName": "Radosław",
           "lastName": "Stępniak",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Tarnowskie Góry",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1157,7 +1157,7 @@
           "firstName": "Simon",
           "lastName": "Antoniewicz",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Tarnowskie Góry",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1167,7 +1167,7 @@
           "firstName": "Seweryn",
           "lastName": "Walczak",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Tarnowskie Góry",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1177,7 +1177,7 @@
           "firstName": "Olivier",
           "lastName": "Starzyk",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1203,7 +1203,7 @@
           "firstName": "Martin",
           "lastName": "Velký",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1213,7 +1213,7 @@
           "firstName": "Piotr",
           "lastName": "Nieroda",
           "academy": "Favela",
-          "academyId": 0,
+          "academyId": 2905,
           "branch": "Jastrzębie Zdrój",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1223,7 +1223,7 @@
           "firstName": "Dawid",
           "lastName": "Celary",
           "academy": "Natal Grind Team",
-          "academyId": 0,
+          "academyId": 1673,
           "branch": "Katowice",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1233,7 +1233,7 @@
           "firstName": "Adam",
           "lastName": "Frątczak",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1259,7 +1259,7 @@
           "firstName": "Mariusz",
           "lastName": "Harasymów",
           "academy": "Favela",
-          "academyId": 0,
+          "academyId": 2905,
           "branch": "Jastrzębie Zdrój",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1269,7 +1269,7 @@
           "firstName": "Paweł",
           "lastName": "Domaszk",
           "academy": "Draculino Karviná",
-          "academyId": 0,
+          "academyId": 2731,
           "branch": "Karvina",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1279,7 +1279,7 @@
           "firstName": "Ondrej",
           "lastName": "Kramny",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1305,7 +1305,7 @@
           "firstName": "Gracjan",
           "lastName": "Pałka",
           "academy": "Favela",
-          "academyId": 0,
+          "academyId": 2905,
           "branch": "Jastrzębie Zdrój",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1331,7 +1331,7 @@
           "firstName": "Kacper",
           "lastName": "Bielecki",
           "academy": "Draculino Karviná",
-          "academyId": 0,
+          "academyId": 2731,
           "branch": "Karviná",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1357,7 +1357,7 @@
           "firstName": "Patrycjusz",
           "lastName": "Laskowski",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1367,7 +1367,7 @@
           "firstName": "Kacper",
           "lastName": "Maślankiewicz",
           "academy": "Copacabana",
-          "academyId": 0,
+          "academyId": 5,
           "branch": "TZN Grappling Częstochowa",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1377,7 +1377,7 @@
           "firstName": "Adrian",
           "lastName": "Misztal",
           "academy": "Favela",
-          "academyId": 0,
+          "academyId": 2905,
           "branch": "Jastrzębie Zdrój",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1403,7 +1403,7 @@
           "firstName": "Mateusz",
           "lastName": "Tyrkiel",
           "academy": "Unia Jiu Jitsu",
-          "academyId": 0,
+          "academyId": 14,
           "branch": "Rybnik",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1413,7 +1413,7 @@
           "firstName": "Oskar",
           "lastName": "Winkler",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Oława",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1423,7 +1423,7 @@
           "firstName": "Mateusz",
           "lastName": "Pawłowski",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "Dąbrowa Górnicza",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1433,7 +1433,7 @@
           "firstName": "Sylwester",
           "lastName": "Kulaszewicz",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1443,7 +1443,7 @@
           "firstName": "Arkadiusz",
           "lastName": "Bożek",
           "academy": "Academia Gorila",
-          "academyId": 0,
+          "academyId": 9,
           "branch": "Pawłowice",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1469,7 +1469,7 @@
           "firstName": "Oleksii",
           "lastName": "Kravchenko",
           "academy": "Natal Grind Team",
-          "academyId": 0,
+          "academyId": 1673,
           "branch": "Katowice",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1495,7 +1495,7 @@
           "firstName": "Dawid",
           "lastName": "Kamień",
           "academy": "Academia Gorila",
-          "academyId": 0,
+          "academyId": 9,
           "branch": "Pawłowice",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1521,7 +1521,7 @@
           "firstName": "Bartosz",
           "lastName": "Tyrkiel",
           "academy": "Natal Grind Team",
-          "academyId": 0,
+          "academyId": 1673,
           "branch": "Katowice",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1547,7 +1547,7 @@
           "firstName": "Wojciech",
           "lastName": "Kadela",
           "academy": "WroxGym",
-          "academyId": 0,
+          "academyId": 15,
           "branch": "Wrocław",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1557,7 +1557,7 @@
           "firstName": "Kacper",
           "lastName": "Sobota",
           "academy": "Favela",
-          "academyId": 0,
+          "academyId": 2905,
           "branch": "Jastrzębie Zdrój",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1583,7 +1583,7 @@
           "firstName": "Mateusz",
           "lastName": "Schutz",
           "academy": "Academia Gorila",
-          "academyId": 0,
+          "academyId": 9,
           "branch": "Bielsko-Biała",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1609,7 +1609,7 @@
           "firstName": "Piotr",
           "lastName": "Banaszek",
           "academy": "Natal Grind Team",
-          "academyId": 0,
+          "academyId": 1673,
           "branch": "Katowice",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1635,7 +1635,7 @@
           "firstName": "Piotr",
           "lastName": "Jakóbek",
           "academy": "Favela",
-          "academyId": 0,
+          "academyId": 2905,
           "branch": "Jastrzębie Zdrój",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1645,7 +1645,7 @@
           "firstName": "Krzysztof",
           "lastName": "Rduch",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1671,7 +1671,7 @@
           "firstName": "Robert",
           "lastName": "Winiarski",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1681,7 +1681,7 @@
           "firstName": "Paweł",
           "lastName": "Mazanek",
           "academy": "Animmals",
-          "academyId": 0,
+          "academyId": 765,
           "branch": "Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1707,7 +1707,7 @@
           "firstName": "Krzysztof",
           "lastName": "Celary",
           "academy": "Favela",
-          "academyId": 0,
+          "academyId": 2905,
           "branch": "Jastrzębie Zdrój",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1717,7 +1717,7 @@
           "firstName": "Dawid",
           "lastName": "Surma",
           "academy": "Favela",
-          "academyId": 0,
+          "academyId": 2905,
           "branch": "Jastrzębie Zdrój",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false
@@ -1743,7 +1743,7 @@
           "firstName": "Rafał",
           "lastName": "Openchowski",
           "academy": "Rio Grappling Club",
-          "academyId": 0,
+          "academyId": 298,
           "branch": "AniMMAls Zawiercie",
           "nationality": "PL",
           "isDisqualifiedForNoPayment": false

@@ -27,6 +27,11 @@ NEXT_CLUB_TD = re.compile(
     r"</a>\s*</td>\s*<td[^>]*>(.*?)</td>",
     re.I | re.S,
 )
+# Club cell: <a href="/pl/academies/9">Academia Gorila</a> / Warszawa
+ACADEMY_LINK = re.compile(
+    r'<a[^>]+href="(?:https?://[^"]+)?/pl/academies/(\d+)"[^>]*>(.*?)</a>',
+    re.I | re.S,
+)
 
 
 def strip_ws(s: str) -> str:
@@ -35,6 +40,28 @@ def strip_ws(s: str) -> str:
 
 def strip_tags(html: str) -> str:
     return strip_ws(re.sub(r"<[^>]+>", " ", html))
+
+
+def parse_club_td(td_inner: str) -> tuple[str, int, str]:
+    """
+    academy = link text for /pl/academies/{id}
+    academyId = numeric id from href (0 if no academy link)
+    branch = remainder of cell after </a> (leading / stripped)
+    """
+    raw = (td_inner or "").strip()
+    m = ACADEMY_LINK.search(raw)
+    if not m:
+        club = strip_tags(raw)
+        if " / " in club:
+            a, b = club.split(" / ", 1)
+            return (a.strip() or "—", 0, b.strip())
+        return (club or "—", 0, "")
+
+    academy_id = int(m.group(1))
+    academy = strip_ws(re.sub(r"<[^>]+>", " ", m.group(2)))
+    tail = raw[m.end() :]
+    branch = strip_ws(re.sub(r"^/\s*", "", strip_ws(tail)))
+    return (academy or "—", academy_id, branch)
 
 
 def html_to_public_json(html: str) -> dict:
@@ -57,19 +84,15 @@ def html_to_public_json(html: str) -> dict:
                 fn, ln = full, ""
             tail = block[cm.end() : cm.end() + 4000]
             club_m = NEXT_CLUB_TD.search(tail)
-            club_raw = strip_tags(club_m.group(1)) if club_m else ""
-            academy = club_raw
-            branch = ""
-            if " / " in club_raw:
-                academy, branch = club_raw.split(" / ", 1)
-                academy, branch = academy.strip(), branch.strip()
+            td_html = club_m.group(1) if club_m else ""
+            academy, academy_id, branch = parse_club_td(td_html)
             competitors.append(
                 {
                     "publicId": public_id,
                     "firstName": fn,
                     "lastName": ln,
                     "academy": academy or "—",
-                    "academyId": 0,
+                    "academyId": academy_id,
                     "branch": branch,
                     "nationality": "PL",
                     "isDisqualifiedForNoPayment": False,
