@@ -163,7 +163,7 @@ Work in the **dev** repo clone, on branch **`release`** (or create/update it fro
 2. Bring in the latest dev work:
 
    ```bash
-   git merge master -X theirs --no-edit
+   cp README.md README.md.keep-ours && git merge master -X theirs --no-edit && mv README.md.keep-ours README.md && git add README.md && git commit --amend --no-edit
    ```
 
    While **`release`** is checked out, **`theirs`** is **`master`**: if Git reports conflicts, this merge strategy prefers **`master`**’s version of the conflicted hunks (release-only tweaks like **`prod.css`** / **`config.js`** you re-apply in the steps below).
