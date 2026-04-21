@@ -3212,18 +3212,20 @@
     });
   }
 
+  /**
+   * When URL has events_filter, load every event's starting list so
+   * eventParticipantIdMap / aggregate pool are correct on any tab (shared
+   * deep links with tab=fights or tab=harmonogram).
+   */
   function maybeAggregateForEventsTab() {
-    if (
-      getCmTabFromUrl() === CM_TAB_EVENTS &&
-      getEventsFilterIdSetFromUrl()
-    ) {
-      return ensureAggregateParticipantMaps()
-        .then(function () {
-          refreshEventsListVisibility();
-        })
-        .catch(function () {});
+    if (!getEventsFilterIdSetFromUrl()) {
+      return Promise.resolve();
     }
-    return Promise.resolve();
+    return ensureAggregateParticipantMaps()
+      .then(function () {
+        refreshEventsListVisibility();
+      })
+      .catch(function () {});
   }
 
   initCmTabsFromUrl();
