@@ -108,6 +108,8 @@ After changing fixtures, run the script, commit `data/`, push, then the test Wor
 
 7. **CSS theming** — The dev app UI uses one visual theme; **`mode=test`** uses **another** theme so test mode is visually distinct at a glance.
 
+8. **MartialMatch API + `mode=test`** — Starting lists (participants by category) moved from **HTML** to **JSON**; the viewer had to consume the new shape, and **`mode=test`** needed the same — including **adapting fixtures** (JSON snapshots / conversion from legacy HTML) so the test Worker still serves coherent data.
+
 ## Releasing a new version (dev → prod)
 
 **Dev repo:** [github.com/andruwik777/dev.martialmatch.com](https://github.com/andruwik777/dev.martialmatch.com)  
