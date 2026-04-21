@@ -1799,6 +1799,8 @@
     closeFilterPanel();
     replaceSlugInUrl(slugObj.slug, tab);
     notifyUrlChanged();
+    /* Drop previous event's fight count and list until the new bundle resolves. */
+    renderFights(null);
     applyCmTabDom(getCmTabFromUrl());
     updateFilterMainButtonLabel();
     refreshEventsListVisibility();
@@ -1813,7 +1815,11 @@
         syncHeaderEventLine();
         if (placeholderEl) placeholderEl.classList.add("is-hidden");
         clearError();
-        if (lastFightsData) renderFights(lastFightsData);
+        if (lastFightsData) {
+          renderFights(lastFightsData);
+        } else {
+          renderFights(null);
+        }
         refreshHarmonogram();
         prefetchStartingListEarly();
         updatePollingForTab();
