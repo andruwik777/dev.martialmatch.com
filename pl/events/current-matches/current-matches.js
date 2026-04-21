@@ -224,6 +224,30 @@
     return "";
   }
 
+  /**
+   * Lowercase + Polish letters to ASCII (for stable filter grouping keys).
+   */
+  function polishAsciiLowerCore(s) {
+    var t = String(s != null ? s : "")
+      .toLowerCase()
+      .replace(/\s+/g, " ")
+      .trim();
+    var from = "ąćęłńóśźż";
+    var to = "acelnoszz";
+    var out = "";
+    for (var i = 0; i < t.length; i++) {
+      var ch = t.charAt(i);
+      var idx = from.indexOf(ch);
+      out += idx >= 0 ? to.charAt(idx) : ch;
+    }
+    return out;
+  }
+
+  /** Branch-only normalization for academyId + branch composite group keys. */
+  function normalizeAcademyBranchForGrouping(branch) {
+    return polishAsciiLowerCore(branch);
+  }
+
   function competitorClubLine(c) {
     if (!c) return "";
     return formatAcademyClubLine(c.academy, c.branch);
@@ -2156,13 +2180,29 @@
   }
 
   /**
-   * Stable group key: positive academyId, else fallback so unknown ids do not merge.
+   * Group key: academyId + normalized branch (ASCII, lowercase) when id > 0;
+   * else normalized full display line so similar strings merge without id.
    */
   function clubGroupKeyFromEntry(e) {
     var id = e && e.academyId;
-    if (id != null && id > 0) return "i" + String(id);
+    var brNorm = normalizeAcademyBranchForGrouping(e && e.academyBranch);
+    if (id != null && id > 0) {
+      return "i" + String(id) + ":" + brNorm;
+    }
     var line = (e && e.clubDisplayLine) || "—";
-    return "n:" + line;
+    return "n:" + polishAsciiLowerCore(line);
+  }
+
+  /** Section title in filter: canonical branch spelling for id>0 groups. */
+  function filterClubSectionLabel(entry) {
+    if (!entry) return "—";
+    if (entry.academyId != null && entry.academyId > 0) {
+      return formatAcademyClubLine(
+        entry.academyName,
+        normalizeAcademyBranchForGrouping(entry.academyBranch)
+      );
+    }
+    return entry.clubDisplayLine || "—";
   }
 
   function groupEntriesByClub(entries) {
@@ -2176,17 +2216,16 @@
     }
     var clubKeys = Object.keys(byClub);
     clubKeys.sort(function (a, b) {
-      var da =
-        (byClub[a][0] && byClub[a][0].clubDisplayLine) || "—";
-      var db =
-        (byClub[b][0] && byClub[b][0].clubDisplayLine) || "—";
-      return enCollator.compare(da, db);
+      return enCollator.compare(
+        filterClubSectionLabel(byClub[a][0]),
+        filterClubSectionLabel(byClub[b][0])
+      );
     });
     for (var j = 0; j < clubKeys.length; j++) {
       byClub[clubKeys[j]].sort(compareEntriesByName);
     }
     var clubNames = clubKeys.map(function (k) {
-      return (byClub[k][0] && byClub[k][0].clubDisplayLine) || "—";
+      return filterClubSectionLabel(byClub[k][0]);
     });
     return { clubKeys: clubKeys, clubNames: clubNames, byClub: byClub };
   }
