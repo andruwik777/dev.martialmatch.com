@@ -298,12 +298,10 @@
     return wrap;
   }
 
+  /** Show schedule/API mat name as-is; fallback only when name is missing. */
   function buildMatDisplayName(matNameRaw, matId) {
-    var s = String(matNameRaw || "").trim() || "Mat " + matId;
-    s = s.replace(/^mata\s+/i, "mat ");
-    s = s.replace(/^mat\s+/i, "mat ");
-    if (!/^mat\s/i.test(s)) s = "mat " + s;
-    return s.toLowerCase();
+    var s = String(matNameRaw || "").trim();
+    return s || "Mat " + String(matId);
   }
 
   function buildMatMapFromSchedules(payload) {
