@@ -248,6 +248,24 @@
     return polishAsciiLowerCore(branch);
   }
 
+  /**
+   * Filter / club-jump labels: each word starts with a capital letter (ASCII).
+   * Words split on spaces, underscores, hyphens; output words joined with spaces.
+   */
+  function titleCaseBranchWordsForDisplay(asciiLowerBranch) {
+    var parts = String(asciiLowerBranch || "")
+      .split(/[\s_-]+/)
+      .filter(function (p) {
+        return p.length > 0;
+      });
+    if (!parts.length) return "";
+    return parts
+      .map(function (w) {
+        return w.charAt(0).toUpperCase() + w.slice(1).toLowerCase();
+      })
+      .join(" ");
+  }
+
   function competitorClubLine(c) {
     if (!c) return "";
     return formatAcademyClubLine(c.academy, c.branch);
@@ -2195,10 +2213,9 @@
   function filterClubSectionLabel(entry) {
     if (!entry) return "—";
     if (entry.academyId != null && entry.academyId > 0) {
-      return formatAcademyClubLine(
-        entry.academyName,
-        normalizeAcademyBranchForGrouping(entry.academyBranch)
-      );
+      var brKey = normalizeAcademyBranchForGrouping(entry.academyBranch);
+      var brDisp = titleCaseBranchWordsForDisplay(brKey);
+      return formatAcademyClubLine(entry.academyName, brDisp);
     }
     return entry.clubDisplayLine || "—";
   }
