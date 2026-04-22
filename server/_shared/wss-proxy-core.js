@@ -14,6 +14,87 @@ var MM_DEFAULT_UPSTREAM = "wss://martialmatch.com/_wss";
 var MM_UPSTREAM_ORIGIN = "https://martialmatch.com";
 
 /**
+ * Browser origins allowed to open the *proxy* WebSocket. Match Cloudflare workers CORS
+ * (server/.../worker.js). Override on deploy: WSS_ALLOWED_ORIGINS="https://a,http://b"
+ * (comma-separated, exact string match, case-sensitive as per fetch Origin).
+ * @type {string[]}
+ */
+var DEFAULT_CLIENT_ORIGINS = [
+  "https://andruwik777.github.io",
+  "http://localhost:8080",
+];
+
+/**
+ * @param {import("net").Socket} socket
+ */
+function rejectUpgradeWith403(socket) {
+  var body = "Forbidden";
+  var len;
+  try {
+    len = Buffer.byteLength(body, "utf8");
+  } catch (e) {
+    len = 9;
+  }
+  try {
+    socket.write(
+      "HTTP/1.1 403 Forbidden\r\n" +
+        "Content-Type: text/plain; charset=utf-8\r\n" +
+        "Content-Length: " +
+        String(len) +
+        "\r\n" +
+        "Connection: close\r\n" +
+        "\r\n" +
+        body
+    );
+  } catch (e) {
+    /* ignore */
+  }
+  try {
+    socket.destroy();
+  } catch (e) {
+    /* ignore */
+  }
+}
+
+/**
+ * @param {string} fromEnv
+ * @returns {string[]}
+ */
+function parseOriginsFromEnv(fromEnv) {
+  return String(fromEnv)
+    .split(",")
+    .map(function (s) {
+      return s.trim();
+    })
+    .filter(function (s) {
+      return s.length > 0;
+    });
+}
+
+/**
+ * @param {object} opts
+ * @returns {string[]}
+ */
+function resolveClientAllowedOrigins(opts) {
+  if (process.env.WSS_ALLOWED_ORIGINS && String(process.env.WSS_ALLOWED_ORIGINS).trim()) {
+    return parseOriginsFromEnv(process.env.WSS_ALLOWED_ORIGINS);
+  }
+  if (opts.allowedClientOrigins && Array.isArray(opts.allowedClientOrigins)) {
+    var a = opts.allowedClientOrigins
+      .map(function (o) {
+        return String(o).trim();
+      })
+      .filter(function (o) {
+        return o.length > 0;
+      });
+    if (a.length) {
+      return a;
+    }
+  }
+  return DEFAULT_CLIENT_ORIGINS.slice();
+}
+
+/**
  * @param {import("ws").WebSocket} ws
  * @param {string} line
  */
@@ -47,6 +128,8 @@ function handleHttpHealth(req, res) {
  * @param {string} [opts.fixturePath] devtest: path to 628-wss-timeline.json
  * @param {number} [opts.port]
  * @param {string} [opts.path] WebSocket path, default "/"
+ * @param {string[]} [opts.allowedClientOrigins] Browsers: Sec-WebSocket request Origin
+ *   must be one of these (or use env WSS_ALLOWED_ORIGINS to replace the list).
  */
 function startWssProxy(opts) {
   var mode = opts.mode || "production";
@@ -56,6 +139,7 @@ function startWssProxy(opts) {
   if (mountPath !== "/" && mountPath.charAt(0) !== "/") {
     mountPath = "/" + mountPath;
   }
+  var allowedClientOrigins = resolveClientAllowedOrigins(opts);
 
   /** @type {Map<string, { clients: Set<import("ws").WebSocket> }>} */
   var devtestChannels = new Map();
@@ -335,6 +419,17 @@ function startWssProxy(opts) {
       socket.destroy();
       return;
     }
+    var origin = "";
+    if (req.headers && req.headers.origin) {
+      origin = String(req.headers.origin).trim();
+    }
+    if (allowedClientOrigins.indexOf(origin) === -1) {
+      console.warn(
+        "[wss-proxy] reject upgrade: disallowed origin=" + JSON.stringify(origin)
+      );
+      rejectUpgradeWith403(socket);
+      return;
+    }
     wss.handleUpgrade(req, socket, head, function (ws) {
       wss.emit("connection", ws, req);
     });
@@ -371,7 +466,9 @@ function startWssProxy(opts) {
         port +
         " mode=" +
         mode +
-        (mode === "devtest" ? " fixture=" + (opts.fixturePath || "") : "")
+        (mode === "devtest" ? " fixture=" + (opts.fixturePath || "") : "") +
+        " clientOrigins=" +
+        allowedClientOrigins.length
     );
   });
 }
