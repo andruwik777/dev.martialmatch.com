@@ -1,6 +1,6 @@
 /**
  * WebSocket proxy: browser clients (JSON lines) <-> scoreboard channels <-> upstream WSS
- * (MartialMatch) or devtest fixture tick. CommonJS; used by server/*/wss-proxy.js
+ * (MartialMatch) or devtest fixture tick. CommonJS; used by server/.../wss-proxy.js
  */
 /* eslint-disable no-console */
 "use strict";
