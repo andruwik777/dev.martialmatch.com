@@ -357,50 +357,40 @@
       }
     }
     var tmr = art.querySelector(".mm-fight__wss-timer");
+    var wssRace = art.querySelector(".mm-fight__wss-race");
     if (tmr) {
       tmr.textContent = formatWssCountdownSec(msg.internalTime);
-      tmr.removeAttribute("hidden");
+    }
+    if (wssRace) {
+      wssRace.removeAttribute("hidden");
     }
     var bm = msg.blueMajorPoints != null ? msg.blueMajorPoints : 0;
     var rm = msg.redMajorPoints != null ? msg.redMajorPoints : 0;
     var bp = msg.bluePenaltyPoints != null ? msg.bluePenaltyPoints : 0;
     var rp = msg.redPenaltyPoints != null ? msg.redPenaltyPoints : 0;
-    var blueS = art.querySelector(".mm-fight__wss-score--blue");
-    var redS = art.querySelector(".mm-fight__wss-score--red");
-    if (blueS) {
-      var bM = blueS.querySelector(".mm-fight__wss-score-major");
-      var bP = blueS.querySelector(".mm-fight__wss-score-pen");
-      if (bM) {
-        bM.textContent = String(bm);
+    [ "blue", "red" ].forEach(function (side) {
+      var row = art.querySelector(
+        ".mm-fight__athlete--" + side + " .mm-fight__wss-pair"
+      );
+      if (!row) {
+        return;
       }
-      if (bP) {
-        if (bp > 0) {
-          bP.textContent = "p" + String(bp);
-          bP.removeAttribute("hidden");
-        } else {
-          bP.textContent = "";
-          bP.setAttribute("hidden", "hidden");
-        }
+      var earned = row.querySelector(
+        ".mm-fight__wss-tile--earned"
+      );
+      var pen = row.querySelector(".mm-fight__wss-tile--pen");
+      if (earned) {
+        earned.textContent = String(
+          side === "blue" ? bm : rm
+        );
       }
-      blueS.removeAttribute("hidden");
-    }
-    if (redS) {
-      var rM = redS.querySelector(".mm-fight__wss-score-major");
-      var rP = redS.querySelector(".mm-fight__wss-score-pen");
-      if (rM) {
-        rM.textContent = String(rm);
+      if (pen) {
+        pen.textContent = String(
+          side === "blue" ? bp : rp
+        );
       }
-      if (rP) {
-        if (rp > 0) {
-          rP.textContent = "p" + String(rp);
-          rP.removeAttribute("hidden");
-        } else {
-          rP.textContent = "";
-          rP.setAttribute("hidden", "hidden");
-        }
-      }
-      redS.removeAttribute("hidden");
-    }
+      row.removeAttribute("hidden");
+    });
   }
 
   function syncFightsWssForTab() {
@@ -485,6 +475,23 @@
 
   var MAT_PIN_SVG =
     '<svg class="mm-fight__mat-pin" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>';
+
+  var WSS_CHEQUERED_FLAG_SVG =
+    '<svg class="mm-fight__wss-flag" viewBox="0 0 12 9" width="16" height="12" ' +
+    'aria-hidden="true" focusable="false">' +
+    '<rect x="0" y="0" width="3" height="3" fill="#0d0d0d"/>' +
+    '<rect x="3" y="0" width="3" height="3" fill="#edf2f7"/>' +
+    '<rect x="6" y="0" width="3" height="3" fill="#0d0d0d"/>' +
+    '<rect x="9" y="0" width="3" height="3" fill="#edf2f7"/>' +
+    '<rect x="0" y="3" width="3" height="3" fill="#edf2f7"/>' +
+    '<rect x="3" y="3" width="3" height="3" fill="#0d0d0d"/>' +
+    '<rect x="6" y="3" width="3" height="3" fill="#edf2f7"/>' +
+    '<rect x="9" y="3" width="3" height="3" fill="#0d0d0d"/>' +
+    '<rect x="0" y="6" width="3" height="3" fill="#0d0d0d"/>' +
+    '<rect x="3" y="6" width="3" height="3" fill="#edf2f7"/>' +
+    '<rect x="6" y="6" width="3" height="3" fill="#0d0d0d"/>' +
+    '<rect x="9" y="6" width="3" height="3" fill="#edf2f7"/>' +
+    "</svg>";
 
   function competitorDisplayName(c) {
     if (!c) return "—";
@@ -596,16 +603,18 @@
     }
 
     var wss = document.createElement("div");
-    wss.className = "mm-fight__wss-score mm-fight__wss-score--" + corner;
+    wss.className = "mm-fight__wss-pair";
     wss.setAttribute("hidden", "hidden");
-    var wssM = document.createElement("span");
-    wssM.className = "mm-fight__wss-score-major";
-    wssM.textContent = "0";
-    var wssP = document.createElement("span");
-    wssP.className = "mm-fight__wss-score-pen";
-    wssP.setAttribute("hidden", "hidden");
-    wss.appendChild(wssM);
-    wss.appendChild(wssP);
+    var tEarned = document.createElement("div");
+    tEarned.className = "mm-fight__wss-tile mm-fight__wss-tile--earned";
+    tEarned.setAttribute("aria-label", "Earned points");
+    tEarned.textContent = "0";
+    var tPen = document.createElement("div");
+    tPen.className = "mm-fight__wss-tile mm-fight__wss-tile--pen";
+    tPen.setAttribute("aria-label", "Penalty points");
+    tPen.textContent = "0";
+    wss.appendChild(tEarned);
+    wss.appendChild(tPen);
 
     wrap.appendChild(cornerEl);
     wrap.appendChild(main);
@@ -3579,10 +3588,14 @@
         mid.appendChild(badge);
       });
 
-      var wssTmr = document.createElement("span");
-      wssTmr.className = "mm-fight__wss-timer";
-      wssTmr.setAttribute("hidden", "hidden");
-      mid.appendChild(wssTmr);
+      var wssCell = document.createElement("div");
+      wssCell.className = "mm-fight__topbar-wss";
+      var wssRace = document.createElement("div");
+      wssRace.className = "mm-fight__wss-race";
+      wssRace.setAttribute("hidden", "hidden");
+      wssRace.setAttribute("aria-label", "Round time remaining");
+      wssRace.innerHTML = WSS_CHEQUERED_FLAG_SVG + '<span class="mm-fight__wss-timer"></span>';
+      wssCell.appendChild(wssRace);
 
       var right = document.createElement("div");
       right.className = "mm-fight__topbar-right";
@@ -3593,6 +3606,7 @@
       right.appendChild(matSpan);
 
       row1.appendChild(mid);
+      row1.appendChild(wssCell);
       row1.appendChild(right);
       topbar.appendChild(row1);
 
