@@ -20,7 +20,7 @@
    */
   var WSS_BASE_BY_MODE = {
     prod: "",
-    test: "",
+    test: "wss://dev-test-martialmatch-v1.onrender.com",
   };
 
   var loc = global.location;
