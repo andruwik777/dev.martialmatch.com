@@ -97,14 +97,17 @@ function resolveClientAllowedOrigins(opts) {
 /**
  * @param {import("ws").WebSocket} ws
  * @param {string} line
+ * @returns {boolean} true if send attempted to an open socket (best-effort)
  */
 function sendJsonLine(ws, line) {
-  if (ws.readyState === WebSocket.OPEN) {
-    try {
-      ws.send(line);
-    } catch (e) {
-      /* ignore */
-    }
+  if (ws.readyState !== WebSocket.OPEN) {
+    return false;
+  }
+  try {
+    ws.send(line);
+    return true;
+  } catch (e) {
+    return false;
   }
 }
 
@@ -239,10 +242,7 @@ function startWssProxy(opts) {
     });
     u.on("message", function (data, isBinary) {
       var line = isBinary ? data.toString() : String(data);
-      var clients = entry.clients;
-      clients.forEach(function (cws) {
-        sendJsonLine(cws, line);
-      });
+      forwardLineToProdEntrySubscribers(entry, line);
     });
     u.on("close", function (code) {
       if (entry.upstream === u) {
@@ -349,6 +349,33 @@ function startWssProxy(opts) {
     });
   }
 
+  /**
+   * Drop closed clients from entry.clients so we do not keep dead sockets after failed send.
+   */
+  function forwardLineToProdEntrySubscribers(entry, line) {
+    var toDrop = [];
+    entry.clients.forEach(function (cws) {
+      if (!sendJsonLine(cws, line)) {
+        toDrop.push(cws);
+      }
+    });
+    toDrop.forEach(function (cws) {
+      clientRemoveAllSubscriptions(cws);
+    });
+  }
+
+  function forwardLineToDevtestSubscribers(d, line) {
+    var toDrop = [];
+    d.clients.forEach(function (cws) {
+      if (!sendJsonLine(cws, line)) {
+        toDrop.push(cws);
+      }
+    });
+    toDrop.forEach(function (cws) {
+      clientRemoveAllSubscriptions(cws);
+    });
+  }
+
   function startDevtestTickIfNeeded() {
     if (devtestTick) return;
     devtestTick = setInterval(broadcastDevtestFrame, 1000);
@@ -375,7 +402,9 @@ function startWssProxy(opts) {
     }
     var row = list[idx];
     if (row) {
-      sendJsonLine(cws, JSON.stringify(row));
+      if (!sendJsonLine(cws, JSON.stringify(row))) {
+        clientRemoveAllSubscriptions(cws);
+      }
     }
   }
 
@@ -391,9 +420,7 @@ function startWssProxy(opts) {
     var row = list[i];
     if (row) {
       var line = JSON.stringify(row);
-      d.clients.forEach(function (cws) {
-        sendJsonLine(cws, line);
-      });
+      forwardLineToDevtestSubscribers(d, line);
     }
     i = (i + 1) % list.length;
     devtestIndex.set(ch, i);
