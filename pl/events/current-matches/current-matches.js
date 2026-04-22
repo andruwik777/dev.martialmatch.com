@@ -356,24 +356,50 @@
         tb.className = "mm-fight__topbar mm-fight__topbar--" + v;
       }
     }
-    var live = art.querySelector(".mm-fight__live");
-    if (live) {
-      live.removeAttribute("hidden");
-      var tms = live.querySelector(".mm-fight__live-timer");
-      var scs = live.querySelector(".mm-fight__live-score");
-      if (tms) {
-        tms.textContent = formatWssCountdownSec(msg.internalTime);
+    var tmr = art.querySelector(".mm-fight__wss-timer");
+    if (tmr) {
+      tmr.textContent = formatWssCountdownSec(msg.internalTime);
+      tmr.removeAttribute("hidden");
+    }
+    var bm = msg.blueMajorPoints != null ? msg.blueMajorPoints : 0;
+    var rm = msg.redMajorPoints != null ? msg.redMajorPoints : 0;
+    var bp = msg.bluePenaltyPoints != null ? msg.bluePenaltyPoints : 0;
+    var rp = msg.redPenaltyPoints != null ? msg.redPenaltyPoints : 0;
+    var blueS = art.querySelector(".mm-fight__wss-score--blue");
+    var redS = art.querySelector(".mm-fight__wss-score--red");
+    if (blueS) {
+      var bM = blueS.querySelector(".mm-fight__wss-score-major");
+      var bP = blueS.querySelector(".mm-fight__wss-score-pen");
+      if (bM) {
+        bM.textContent = String(bm);
       }
-      if (scs) {
-        var bm = msg.blueMajorPoints != null ? msg.blueMajorPoints : 0;
-        var rm = msg.redMajorPoints != null ? msg.redMajorPoints : 0;
-        var bp = msg.bluePenaltyPoints != null ? msg.bluePenaltyPoints : 0;
-        var rp = msg.redPenaltyPoints != null ? msg.redPenaltyPoints : 0;
-        scs.textContent = bm + ":" + rm;
-        if (bp || rp) {
-          scs.textContent += " (" + bp + ":" + rp + ")";
+      if (bP) {
+        if (bp > 0) {
+          bP.textContent = "p" + String(bp);
+          bP.removeAttribute("hidden");
+        } else {
+          bP.textContent = "";
+          bP.setAttribute("hidden", "hidden");
         }
       }
+      blueS.removeAttribute("hidden");
+    }
+    if (redS) {
+      var rM = redS.querySelector(".mm-fight__wss-score-major");
+      var rP = redS.querySelector(".mm-fight__wss-score-pen");
+      if (rM) {
+        rM.textContent = String(rm);
+      }
+      if (rP) {
+        if (rp > 0) {
+          rP.textContent = "p" + String(rp);
+          rP.removeAttribute("hidden");
+        } else {
+          rP.textContent = "";
+          rP.setAttribute("hidden", "hidden");
+        }
+      }
+      redS.removeAttribute("hidden");
     }
   }
 
@@ -563,14 +589,27 @@
 
     var club = competitorClubLine(c);
     if (club) {
-      var row2 = document.createElement("div");
-      row2.className = "mm-fight__club";
-      row2.textContent = club;
-      main.appendChild(row2);
+      var clubLine = document.createElement("div");
+      clubLine.className = "mm-fight__club";
+      clubLine.textContent = club;
+      main.appendChild(clubLine);
     }
+
+    var wss = document.createElement("div");
+    wss.className = "mm-fight__wss-score mm-fight__wss-score--" + corner;
+    wss.setAttribute("hidden", "hidden");
+    var wssM = document.createElement("span");
+    wssM.className = "mm-fight__wss-score-major";
+    wssM.textContent = "0";
+    var wssP = document.createElement("span");
+    wssP.className = "mm-fight__wss-score-pen";
+    wssP.setAttribute("hidden", "hidden");
+    wss.appendChild(wssM);
+    wss.appendChild(wssP);
 
     wrap.appendChild(cornerEl);
     wrap.appendChild(main);
+    wrap.appendChild(wss);
     return wrap;
   }
 
@@ -3513,37 +3552,37 @@
       topbar.className =
         "mm-fight__topbar mm-fight__topbar--" + variant;
 
-      var left = document.createElement("div");
-      left.className = "mm-fight__topbar-left";
+      var row1 = document.createElement("div");
+      row1.className = "mm-fight__topbar-row1";
+
+      var mid = document.createElement("div");
+      mid.className = "mm-fight__topbar-mid";
 
       var num = pf.fightNumber != null ? pf.fightNumber : idx + 1;
       var hash = document.createElement("span");
       hash.className = "mm-fight__fight-num";
       hash.textContent = "#" + num;
-      left.appendChild(hash);
+      mid.appendChild(hash);
 
       var t = parseStartTimeUtc(row.startTime);
       var timeSpan = document.createElement("span");
       timeSpan.className = "mm-fight__top-time";
       timeSpan.textContent =
         t && !isNaN(t.getTime()) ? timeFmt.format(t) : "—";
-      left.appendChild(timeSpan);
-
-      var cat = formatCategoryDisplay(pf.category);
-      if (cat) {
-        var catEl = document.createElement("span");
-        catEl.className = "mm-fight__top-category";
-        catEl.textContent = cat;
-        left.appendChild(catEl);
-      }
+      mid.appendChild(timeSpan);
 
       roundBadgeList(pf).forEach(function (b) {
         var badge = document.createElement("span");
         badge.className =
           "mm-fight__rb mm-fight__rb--" + b.variant;
         badge.textContent = b.text;
-        left.appendChild(badge);
+        mid.appendChild(badge);
       });
+
+      var wssTmr = document.createElement("span");
+      wssTmr.className = "mm-fight__wss-timer";
+      wssTmr.setAttribute("hidden", "hidden");
+      mid.appendChild(wssTmr);
 
       var right = document.createElement("div");
       right.className = "mm-fight__topbar-right";
@@ -3553,19 +3592,20 @@
       matSpan.textContent = matNameDisplay;
       right.appendChild(matSpan);
 
-      topbar.appendChild(left);
-      topbar.appendChild(right);
+      row1.appendChild(mid);
+      row1.appendChild(right);
+      topbar.appendChild(row1);
 
-      var liveRow = document.createElement("div");
-      liveRow.className = "mm-fight__live";
-      liveRow.setAttribute("hidden", "hidden");
-      var tmrL = document.createElement("span");
-      tmrL.className = "mm-fight__live-timer";
-      var scL = document.createElement("span");
-      scL.className = "mm-fight__live-score";
-      liveRow.appendChild(tmrL);
-      liveRow.appendChild(scL);
-      topbar.appendChild(liveRow);
+      var cat = formatCategoryDisplay(pf.category);
+      if (cat) {
+        var row2 = document.createElement("div");
+        row2.className = "mm-fight__topbar-row2";
+        var catEl = document.createElement("div");
+        catEl.className = "mm-fight__top-category";
+        catEl.textContent = cat;
+        row2.appendChild(catEl);
+        topbar.appendChild(row2);
+      }
 
       var body = document.createElement("div");
       body.className = "mm-fight__body";

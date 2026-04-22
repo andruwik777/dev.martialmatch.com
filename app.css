@@ -880,50 +880,47 @@ body {
 
 .mm-fight__topbar {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 0.5rem 0.75rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.2rem 0;
   padding: 0.45rem 0.65rem 0.5rem;
   font-size: 0.8125rem;
   line-height: 1.35;
 }
 
-/* WebSocket live: round timer + score (hides until first message) */
-.mm-fight__live {
+.mm-fight__topbar-row1 {
   display: flex;
-  width: 100%;
-  flex-basis: 100%;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem 0.75rem;
-  margin-top: 0.2rem;
-  font-size: 0.75rem;
-  color: #e2e8f0;
-  font-weight: 600;
+  justify-content: space-between;
+  gap: 0.4rem 0.6rem;
+  min-width: 0;
 }
 
-.mm-fight__live[hidden] {
-  display: none !important;
-}
-
-.mm-fight__live-timer {
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.04em;
-}
-
-.mm-fight__live-score {
-  font-variant-numeric: tabular-nums;
-  opacity: 0.95;
-}
-
-.mm-fight__topbar-left {
+.mm-fight__topbar-mid {
   display: flex;
+  flex: 1;
   flex-wrap: wrap;
   align-items: center;
   gap: 0.35rem 0.5rem;
   min-width: 0;
   color: #fff;
+}
+
+.mm-fight__wss-timer {
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  color: #e2e8f0;
+}
+
+.mm-fight__wss-timer[hidden] {
+  display: none !important;
+}
+
+.mm-fight__topbar-row2 {
+  min-width: 0;
 }
 
 .mm-fight__topbar-right {
@@ -958,6 +955,9 @@ body {
 .mm-fight__top-category {
   color: #e2e8f0;
   font-weight: 500;
+  font-size: 0.8rem;
+  line-height: 1.3;
+  word-wrap: break-word;
 }
 
 .mm-fight__rb {
@@ -1009,6 +1009,10 @@ body {
   color: #faf089;
 }
 
+.mm-fight__topbar--called .mm-fight__wss-timer {
+  color: #faf089;
+}
+
 /* fightQueueStatuses: 2 — walka trwa */
 .mm-fight__topbar--active {
   background: #276749;
@@ -1021,6 +1025,10 @@ body {
 }
 
 .mm-fight__topbar--active .mm-fight__topbar-right {
+  color: #c6f6d5;
+}
+
+.mm-fight__topbar--active .mm-fight__wss-timer {
   color: #c6f6d5;
 }
 
@@ -1050,19 +1058,23 @@ body {
 }
 
 .mm-fight__body {
+  margin: 0;
   padding: 0;
   background: #2d3748;
+  border-top: 1px solid #4a5568;
+  box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.15);
 }
 
 .mm-fight__athlete {
   display: flex;
   min-height: 3rem;
   align-items: stretch;
-  border-top: 1px solid #1a202c;
+  border-top: none;
 }
 
-.mm-fight__athlete:first-of-type {
-  border-top: none;
+.mm-fight__athlete + .mm-fight__athlete {
+  border-top: 1px solid #4a5568;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
 .mm-fight__corner {
@@ -1078,10 +1090,63 @@ body {
   background: #e53e3e;
 }
 
+.mm-fight__wss-score {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  flex-shrink: 0;
+  align-items: center;
+  align-self: stretch;
+  justify-content: center;
+  min-width: 2.5rem;
+  max-width: 3.5rem;
+  margin: 0.35rem 0.4rem 0.35rem 0;
+  padding: 0.3rem 0.45rem;
+  border-radius: 6px;
+  line-height: 1.1;
+  text-align: center;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.mm-fight__wss-score[hidden] {
+  display: none !important;
+}
+
+.mm-fight__wss-score--blue {
+  color: #f0fff4;
+  background: #276749;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.mm-fight__wss-score--red {
+  color: #fff5f5;
+  background: #9b2c2c;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.mm-fight__wss-score-major {
+  font-size: 1.05rem;
+}
+
+.mm-fight__wss-score-pen {
+  margin-top: 0.12rem;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: lowercase;
+  opacity: 0.92;
+}
+
+.mm-fight__wss-score-pen[hidden] {
+  display: none !important;
+}
+
 .mm-fight__athlete-main {
   flex: 1;
   min-width: 0;
-  padding: 0.5rem 0.65rem 0.55rem 0.5rem;
+  padding: 0.5rem 0.2rem 0.55rem 0.5rem;
 }
 
 .mm-fight__athlete-line1 {
