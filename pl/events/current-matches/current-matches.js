@@ -2501,6 +2501,20 @@
     }
   }
 
+  function makeFilterDqNoPaymentIcon(ariaLabel, extraClass) {
+    var el = document.createElement("span");
+    el.className =
+      "mm-filter-row__dq-icon" + (extraClass ? " " + extraClass : "");
+    el.setAttribute("role", "img");
+    el.setAttribute("aria-label", ariaLabel);
+    el.innerHTML =
+      '<svg class="mm-filter-row__dq-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" focusable="false" aria-hidden="true">' +
+      '<path fill="#ebc53d" d="M12 2.2 21.5 20.5H2.5L12 2.2z"/>' +
+      '<path fill="#1a1d26" d="M11 9.2h2v5h-2v-5zm0 6.3h2v2.3h-2v-2.3z"/>' +
+      "</svg>";
+    return el;
+  }
+
   function renderFilterListDom(entries) {
     if (!filterListRootEl) return;
     filterListRootEl.innerHTML = "";
@@ -2592,26 +2606,36 @@
         var checkWrap = document.createElement("div");
         checkWrap.className = "mm-filter-row__check";
         if (blockDqNoPayUi) {
-          var dqWrap = document.createElement("span");
-          dqWrap.className = "mm-filter-row__dq-icon";
-          dqWrap.setAttribute("role", "img");
-          dqWrap.setAttribute(
-            "aria-label",
-            "Disqualified for no payment — cannot be added to filter"
+          checkWrap.appendChild(
+            makeFilterDqNoPaymentIcon(
+              "Disqualified for no payment — cannot be added to filter",
+              null
+            )
           );
-          dqWrap.innerHTML =
-            '<svg class="mm-filter-row__dq-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" focusable="false" aria-hidden="true">' +
-            '<path fill="#ebc53d" d="M12 2.2 21.5 20.5H2.5L12 2.2z"/>' +
-            '<path fill="#1a1d26" d="M11 9.2h2v5h-2v-5zm0 6.3h2v2.3h-2v-2.3z"/>' +
-            "</svg>";
-          checkWrap.appendChild(dqWrap);
         } else {
+          var showDqIconWithCheckbox =
+            dqNoPay && !blockDqNoPayUi;
+          if (showDqIconWithCheckbox) {
+            var checkWithDq = document.createElement("div");
+            checkWithDq.className = "mm-filter-row__check-with-dq";
+            checkWithDq.appendChild(
+              makeFilterDqNoPaymentIcon(
+                "Disqualified for no payment on at least one event (still selectable in all-events filter)",
+                "mm-filter-row__dq-icon--selectable"
+              )
+            );
+          }
           var cb = document.createElement("input");
           cb.type = "checkbox";
           cb.value = item.publicId;
           cb.setAttribute("data-mm-filter", "1");
           cb.setAttribute("data-mm-filter-member", "1");
-          checkWrap.appendChild(cb);
+          if (showDqIconWithCheckbox) {
+            checkWithDq.appendChild(cb);
+            checkWrap.appendChild(checkWithDq);
+          } else {
+            checkWrap.appendChild(cb);
+          }
         }
 
         row.appendChild(textWrap);

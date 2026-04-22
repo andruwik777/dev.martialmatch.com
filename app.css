@@ -1753,6 +1753,13 @@ body {
   padding-top: 0.15rem;
 }
 
+.mm-filter-row__check-with-dq {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
 .mm-filter-row__check input {
   width: 1.15rem;
   height: 1.15rem;
