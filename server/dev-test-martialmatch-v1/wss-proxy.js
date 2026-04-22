@@ -1,5 +1,5 @@
 /**
- * devtest: cycles JSON from data/websocket/628-wss-timeline.json (no real MartialMatch).
+ * devtest: cycles JSON from 628 event folder (no real MartialMatch).
  * Set PROXY_MODE=devtest (or default is devtest for this service).
  */
 "use strict";
@@ -10,7 +10,7 @@ var { startWssProxy } = require(path.join(__dirname, "..", "_shared", "wss-proxy
 var fixture = path.join(
   __dirname,
   "data",
-  "websocket",
+  "628-x-superpuchar-polski-bjj-nogi-gi",
   "628-wss-timeline.json"
 );
 

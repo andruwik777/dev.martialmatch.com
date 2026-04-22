@@ -128,7 +128,7 @@ function handleHttpHealth(req, res) {
  * @param {object} opts
  * @param {string} opts.mode "production" | "devtest"
  * @param {string} [opts.upstreamUrl]
- * @param {string} [opts.fixturePath] devtest: path to 628-wss-timeline.json
+ * @param {string} [opts.fixturePath] devtest: path to WSS channel timeline JSON
  * @param {number} [opts.port]
  * @param {string} [opts.path] WebSocket path, default "/"
  * @param {string[]} [opts.allowedClientOrigins] Browsers: Sec-WebSocket request Origin
