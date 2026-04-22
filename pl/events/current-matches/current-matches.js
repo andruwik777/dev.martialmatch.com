@@ -2522,38 +2522,72 @@
     for (var c = 0; c < grouped.clubKeys.length; c++) {
       var clubKey = grouped.clubKeys[c];
       var clubName = grouped.clubNames[c];
+      var list = grouped.byClub[clubKey];
+      var tabForFilter = getCmTabFromUrl();
+      var allClubMembersDqBlock = false;
+      if (tabForFilter !== CM_TAB_EVENTS && list.length > 0) {
+        allClubMembersDqBlock = true;
+        for (var al = 0; al < list.length; al++) {
+          if (!list[al].isDisqualifiedForNoPayment) {
+            allClubMembersDqBlock = false;
+            break;
+          }
+        }
+      }
+
       var section = document.createElement("section");
       section.className = "mm-filter-club";
       section.id = "mm-filter-club-sect-" + c;
 
       var hn = document.createElement("h3");
       hn.className = "mm-filter-club-name mm-filter-club-name--with-select";
+      if (allClubMembersDqBlock) {
+        hn.classList.add("mm-filter-club-name--all-dq-no-payment");
+        hn.setAttribute(
+          "title",
+          "All members are disqualified for no payment for this event — no club select-all (nothing selectable)."
+        );
+        var headRow = document.createElement("div");
+        headRow.className = "mm-filter-club-name__row";
+        var checkWrapDq = document.createElement("span");
+        checkWrapDq.className = "mm-filter-club-name__check-wrap";
+        checkWrapDq.appendChild(
+          makeFilterDqNoPaymentIcon(
+            "All athletes in this club are disqualified for no payment. Club select-all is not available.",
+            "mm-filter-club-name__dq-icon"
+          )
+        );
+        var titleSpanDq = document.createElement("span");
+        titleSpanDq.className = "mm-filter-club-name__title";
+        titleSpanDq.textContent = clubName;
+        headRow.appendChild(checkWrapDq);
+        headRow.appendChild(titleSpanDq);
+        hn.appendChild(headRow);
+      } else {
+        var lab = document.createElement("label");
+        lab.className = "mm-filter-club-name__label";
 
-      var lab = document.createElement("label");
-      lab.className = "mm-filter-club-name__label";
+        var checkWrap = document.createElement("span");
+        checkWrap.className = "mm-filter-club-name__check-wrap";
+        var clubCb = document.createElement("input");
+        clubCb.type = "checkbox";
+        clubCb.setAttribute("data-mm-filter-club", "1");
+        clubCb.setAttribute(
+          "aria-label",
+          "Select or clear all in: " + clubName
+        );
+        clubCb.setAttribute("aria-checked", "false");
+        checkWrap.appendChild(clubCb);
 
-      var checkWrap = document.createElement("span");
-      checkWrap.className = "mm-filter-club-name__check-wrap";
-      var clubCb = document.createElement("input");
-      clubCb.type = "checkbox";
-      clubCb.setAttribute("data-mm-filter-club", "1");
-      clubCb.setAttribute(
-        "aria-label",
-        "Select or clear all in: " + clubName
-      );
-      clubCb.setAttribute("aria-checked", "false");
-      checkWrap.appendChild(clubCb);
+        var titleSpan = document.createElement("span");
+        titleSpan.className = "mm-filter-club-name__title";
+        titleSpan.textContent = clubName;
 
-      var titleSpan = document.createElement("span");
-      titleSpan.className = "mm-filter-club-name__title";
-      titleSpan.textContent = clubName;
-
-      lab.appendChild(checkWrap);
-      lab.appendChild(titleSpan);
-      hn.appendChild(lab);
+        lab.appendChild(checkWrap);
+        lab.appendChild(titleSpan);
+        hn.appendChild(lab);
+      }
       section.appendChild(hn);
-
-      var list = grouped.byClub[clubKey];
       for (var r = 0; r < list.length; r++) {
         var item = list[r];
         var dqNoPay = Boolean(item.isDisqualifiedForNoPayment);
