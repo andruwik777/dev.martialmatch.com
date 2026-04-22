@@ -880,12 +880,41 @@ body {
 
 .mm-fight__topbar {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
   gap: 0.5rem 0.75rem;
   padding: 0.45rem 0.65rem 0.5rem;
   font-size: 0.8125rem;
   line-height: 1.35;
+}
+
+/* WebSocket live: round timer + score (hides until first message) */
+.mm-fight__live {
+  display: flex;
+  width: 100%;
+  flex-basis: 100%;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  color: #e2e8f0;
+  font-weight: 600;
+}
+
+.mm-fight__live[hidden] {
+  display: none !important;
+}
+
+.mm-fight__live-timer {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.mm-fight__live-score {
+  font-variant-numeric: tabular-nums;
+  opacity: 0.95;
 }
 
 .mm-fight__topbar-left {

@@ -108,6 +108,17 @@
   var fightsTabStats = { shown: 0, total: 0 };
   /** @type {object | null} ostatnia poprawna odpowiedź /api/.../fights */
   var lastFightsData = null;
+
+  /** @type {WebSocket|null} */
+  var cmWss = null;
+  /** @type {Record<string, true>} */
+  var cmWssSubscribed = Object.create(null);
+  /** @type {Record<string, string>} */
+  var cmWssDedupByChannel = Object.create(null);
+  /** @type {number|null} */
+  var cmWssReconnectTimer = null;
+  var cmWssBackoffMs = 2000;
+  var CM_WSS_BACKOFF_MAX = 30000;
   /** @type {object | null} pełna odpowiedź /api/events/.../schedules */
   var lastSchedulesPayload = null;
 
@@ -128,6 +139,253 @@
     if (q.status === 2) return "active";
     if (q.status === 1) return "called";
     return "scheduled";
+  }
+
+  function cmWssUrlOk() {
+    var u = cfg.wssBaseUrl;
+    return typeof u === "string" && u.indexOf("wss://") === 0;
+  }
+
+  function formatWssCountdownSec(sec) {
+    var s = Math.max(0, Math.floor(Number(sec) || 0));
+    var m = Math.floor(s / 60);
+    var r = s % 60;
+    return (
+      (m < 10 ? "0" : "") +
+      m +
+      ":" +
+      (r < 10 ? "0" : "") +
+      r
+    );
+  }
+
+  function mapWssToTopbarVariant(msg) {
+    if (!msg || !msg.fightStatus) return null;
+    if (msg.fightStatus === "ongoing") {
+      return "active";
+    }
+    if (msg.fightStatus === "awaiting") {
+      return "called";
+    }
+    return null;
+  }
+
+  function wssLiveDedupKey(msg) {
+    return [
+      String(msg.fightId || ""),
+      String(msg.internalTime != null ? msg.internalTime : ""),
+      String(msg.timerClass || ""),
+      String(msg.fightStatus || ""),
+      String(msg.redMajorPoints != null ? msg.redMajorPoints : ""),
+      String(msg.blueMajorPoints != null ? msg.blueMajorPoints : ""),
+      String(msg.redPenaltyPoints != null ? msg.redPenaltyPoints : ""),
+      String(msg.bluePenaltyPoints != null ? msg.bluePenaltyPoints : ""),
+    ].join(":");
+  }
+
+  function buildWssChannelListForFightsData(data) {
+    if (!data || !data.result || !Array.isArray(data.result)) return [];
+    var seen = Object.create(null);
+    for (var i = 0; i < data.result.length; i++) {
+      var r = data.result[i];
+      var pf = r && r.publicFight;
+      if (!pf || pf.matId == null) continue;
+      seen["scoreboard:mat:" + String(pf.matId)] = true;
+    }
+    return Object.keys(seen);
+  }
+
+  function cmWssClearReconnectTimer() {
+    if (cmWssReconnectTimer != null) {
+      clearTimeout(cmWssReconnectTimer);
+      cmWssReconnectTimer = null;
+    }
+  }
+
+  function cmWssScheduleReconnect() {
+    if (!cmWssUrlOk()) {
+      return;
+    }
+    cmWssClearReconnectTimer();
+    cmWssReconnectTimer = window.setTimeout(function () {
+      cmWssReconnectTimer = null;
+      cmWssConnect();
+    }, cmWssBackoffMs);
+    cmWssBackoffMs = Math.min(cmWssBackoffMs * 2, CM_WSS_BACKOFF_MAX);
+  }
+
+  function cmWssLeaveAllChannels() {
+    if (!cmWss || cmWss.readyState !== 1) {
+      cmWssSubscribed = Object.create(null);
+      return;
+    }
+    var chs = Object.keys(cmWssSubscribed);
+    for (var c = 0; c < chs.length; c++) {
+      try {
+        cmWss.send(
+          JSON.stringify({ leaveChannel: true, channel: chs[c] })
+        );
+      } catch (e) {
+        /* ignore */
+      }
+    }
+    cmWssSubscribed = Object.create(null);
+  }
+
+  function cmWssResyncSubscriptionFromFights() {
+    if (!cmWss || cmWss.readyState !== 1) {
+      return;
+    }
+    if (!evSlug || getCmTabFromUrl() !== CM_TAB_FIGHTS) {
+      return;
+    }
+    if (!lastFightsData) {
+      return;
+    }
+    var want = buildWssChannelListForFightsData(lastFightsData);
+    var wmap = Object.create(null);
+    for (var a = 0; a < want.length; a++) {
+      wmap[want[a]] = true;
+    }
+    var cur = Object.keys(cmWssSubscribed);
+    for (var i = 0; i < cur.length; i++) {
+      if (!wmap[cur[i]] && cmWssSubscribed[cur[i]]) {
+        try {
+          cmWss.send(
+            JSON.stringify({ leaveChannel: true, channel: cur[i] })
+          );
+        } catch (e) {
+          /* ignore */
+        }
+        delete cmWssSubscribed[cur[i]];
+      }
+    }
+    for (var w = 0; w < want.length; w++) {
+      if (!cmWssSubscribed[want[w]]) {
+        try {
+          cmWss.send(JSON.stringify({ channel: want[w] }));
+          cmWssSubscribed[want[w]] = true;
+        } catch (e) {
+          /* ignore */
+        }
+      }
+    }
+  }
+
+  function cmWssConnect() {
+    if (!cmWssUrlOk()) {
+      return;
+    }
+    if (cmWss && (cmWss.readyState === 0 || cmWss.readyState === 1)) {
+      return;
+    }
+    try {
+      cmWss = new WebSocket(cfg.wssBaseUrl);
+    } catch (e) {
+      cmWss = null;
+      cmWssScheduleReconnect();
+      return;
+    }
+    cmWssBackoffMs = 2000;
+    cmWss.addEventListener("open", function () {
+      cmWssBackoffMs = 2000;
+      cmWssSubscribed = Object.create(null);
+      cmWssResyncSubscriptionFromFights();
+    });
+    cmWss.addEventListener("message", function (ev) {
+      var m;
+      try {
+        m = JSON.parse(
+          String(ev.data != null ? ev.data : "")
+        );
+      } catch (e) {
+        return;
+      }
+      if (!m || !m.channel) {
+        return;
+      }
+      var dkey = wssLiveDedupKey(m);
+      if (cmWssDedupByChannel[m.channel] === dkey) {
+        return;
+      }
+      cmWssDedupByChannel[m.channel] = dkey;
+      applyWssLiveToFightRow(m);
+    });
+    var sock = cmWss;
+    cmWss.addEventListener("close", function () {
+      if (cmWss !== sock) {
+        return;
+      }
+      cmWss = null;
+      cmWssScheduleReconnect();
+    });
+    cmWss.addEventListener("error", function () {
+      /* close follows */
+    });
+  }
+
+  function applyWssLiveToFightRow(msg) {
+    if (!listEl) {
+      return;
+    }
+    if (!msg || msg.fightId == null) {
+      return;
+    }
+    var matMatch = String(msg.channel || "").match(
+      /^scoreboard:mat:(\d+)$/
+    );
+    if (!matMatch) {
+      return;
+    }
+    var matId = matMatch[1];
+    var art = listEl.querySelector(
+      'article.mm-fight[data-mm-mat-id="' + String(matId) + '"]'
+    );
+    if (!art) {
+      return;
+    }
+    if (String(art.getAttribute("data-mm-fight-id") || "") !==
+      String(msg.fightId)
+    ) {
+      return;
+    }
+    var v = mapWssToTopbarVariant(msg);
+    if (v) {
+      var tb = art.querySelector(".mm-fight__topbar");
+      if (tb) {
+        tb.className = "mm-fight__topbar mm-fight__topbar--" + v;
+      }
+    }
+    var live = art.querySelector(".mm-fight__live");
+    if (live) {
+      live.removeAttribute("hidden");
+      var tms = live.querySelector(".mm-fight__live-timer");
+      var scs = live.querySelector(".mm-fight__live-score");
+      if (tms) {
+        tms.textContent = formatWssCountdownSec(msg.internalTime);
+      }
+      if (scs) {
+        var bm = msg.blueMajorPoints != null ? msg.blueMajorPoints : 0;
+        var rm = msg.redMajorPoints != null ? msg.redMajorPoints : 0;
+        var bp = msg.bluePenaltyPoints != null ? msg.bluePenaltyPoints : 0;
+        var rp = msg.redPenaltyPoints != null ? msg.redPenaltyPoints : 0;
+        scs.textContent = bm + ":" + rm;
+        if (bp || rp) {
+          scs.textContent += " (" + bp + ":" + rp + ")";
+        }
+      }
+    }
+  }
+
+  function syncFightsWssForTab() {
+    if (!cmWssUrlOk()) {
+      return;
+    }
+    if (evSlug && getCmTabFromUrl() === CM_TAB_FIGHTS) {
+      cmWssResyncSubscriptionFromFights();
+    } else {
+      cmWssLeaveAllChannels();
+    }
   }
 
   function parseStartTimeUtc(isoLike) {
@@ -2040,6 +2298,16 @@
     } else {
       stopPoll();
     }
+    if (evSlug && cmWssUrlOk()) {
+      if (cfg && cfg.wssPreconnect === false) {
+        if (getCmTabFromUrl() === CM_TAB_FIGHTS) {
+          cmWssConnect();
+        }
+      } else {
+        cmWssConnect();
+      }
+    }
+    syncFightsWssForTab();
   }
 
   function applyCmTabDom(tab) {
@@ -3190,6 +3458,7 @@
     if (!listEl) return;
 
     lastFightsData = data;
+    cmWssDedupByChannel = Object.create(null);
     listEl.innerHTML = "";
 
     var idSet = getSlugFilterIdSetFromUrl();
@@ -3212,6 +3481,9 @@
       fightsTabStats.total = 0;
       fightsTabSecondsLeft = getFightsRefreshPeriodSec();
       updateFightsTabLabel();
+      if (evSlug && getCmTabFromUrl() === CM_TAB_FIGHTS && cmWssUrlOk()) {
+        cmWssResyncSubscriptionFromFights();
+      }
       if (toolbarEl) {
         toolbarEl.classList.add("is-hidden");
         toolbarEl.textContent = "";
@@ -3234,6 +3506,8 @@
 
       var article = document.createElement("article");
       article.className = "mm-fight";
+      article.setAttribute("data-mm-mat-id", String(matId));
+      article.setAttribute("data-mm-fight-id", String(fightId));
 
       var topbar = document.createElement("div");
       topbar.className =
@@ -3282,6 +3556,17 @@
       topbar.appendChild(left);
       topbar.appendChild(right);
 
+      var liveRow = document.createElement("div");
+      liveRow.className = "mm-fight__live";
+      liveRow.setAttribute("hidden", "hidden");
+      var tmrL = document.createElement("span");
+      tmrL.className = "mm-fight__live-timer";
+      var scL = document.createElement("span");
+      scL.className = "mm-fight__live-score";
+      liveRow.appendChild(tmrL);
+      liveRow.appendChild(scL);
+      topbar.appendChild(liveRow);
+
       var body = document.createElement("div");
       body.className = "mm-fight__body";
       body.appendChild(buildAthleteRow(pf.firstCompetitor, "blue"));
@@ -3296,6 +3581,10 @@
     fightsTabStats.total = allRows.length;
     fightsTabSecondsLeft = getFightsRefreshPeriodSec();
     updateFightsTabLabel();
+    if (evSlug && getCmTabFromUrl() === CM_TAB_FIGHTS && cmWssUrlOk()) {
+      cmWssConnect();
+      cmWssResyncSubscriptionFromFights();
+    }
     if (toolbarEl) {
       toolbarEl.classList.add("is-hidden");
       toolbarEl.textContent = "";
@@ -3509,5 +3798,17 @@
       });
   });
 
-  window.addEventListener("pagehide", stopPoll);
+  window.addEventListener("pagehide", function () {
+    stopPoll();
+    cmWssClearReconnectTimer();
+    cmWssLeaveAllChannels();
+    if (cmWss) {
+      try {
+        cmWss.close();
+      } catch (e) {
+        /* ignore */
+      }
+      cmWss = null;
+    }
+  });
 })();
