@@ -1,5 +1,5 @@
 /**
- * WebSocket scoreboard proxy — production Render. Default: production mode to real MM.
+ * WebSocket scoreboard proxy — Render (default: production mode to real MM upstream).
  */
 "use strict";
 
