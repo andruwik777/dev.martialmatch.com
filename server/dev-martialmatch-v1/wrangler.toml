@@ -1,0 +1,2 @@
+name = "haha_test-worker-name-in-wrangler"
+main = "worker.js"
