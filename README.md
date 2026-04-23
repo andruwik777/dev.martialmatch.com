@@ -28,6 +28,55 @@ Filters are stored in the **URL**, so you can **share a link** with friends or p
 
 - **Report bugs or request a feature:** [GitHub Issues](https://github.com/andruwik777/dev.martialmatch.com/issues)
 
+## Architecture: GitHub Pages → your proxies → martialmatch.com
+
+The app is a **vanilla JavaScript** single-page site on **GitHub Pages**. It does **not** call `martialmatch.com` directly from the browser for app data. Instead it keeps **two parallel connections** to infrastructure you control, with **martialmatch.com** as the real upstream for both.
+
+### Why a WebSocket, not only HTTP
+
+Live **fights** and the **scoreboard** (timer, status, points) are updated in real time over **WebSocket** channels, the same way the official product does. REST alone is not enough for that live layer.
+
+### Why two different proxies
+
+1. **HTTP / JSON** — Browsers enforce **CORS**. A page on `*.github.io` cannot read the official API responses unless the server sends an allowlist for that origin. The public API is not set up for third-party web origins, so the app uses a **Cloudflare Worker** ([`BASE_BY_MODE`](config.js)) that forwards `/api/…` and adds the appropriate **CORS** headers.
+2. **WebSocket** — The upstream `wss://` scoreboard is tied to **first-party / expected `Origin`** behavior. A GitHub Pages origin is rejected for that connection path. The app therefore opens **`wss://` to a small Node proxy** that you run yourself; the proxy opens the real upstream socket with an allowed origin and forwards channel messages to the browser. **Without this WebSocket proxy, live scoreboard data is not available in the public build.** Configure `WSS_BASE_BY_MODE` in [config.js](config.js); details in [server/README-wss.md](server/README-wss.md).
+
+### Deployment (where the proxies run)
+
+- **WebSocket** scoreboard proxy: deployed on **[Render](https://render.com/)** (see [server/README-wss.md](server/README-wss.md) and `WSS_BASE_BY_MODE` in [config.js](config.js)).
+- **HTTP** API proxy: **Cloudflare Workers** (see `BASE_BY_MODE` in [config.js](config.js) and the [For developers](#for-developers) section).
+- **Static UI:** this repo, **GitHub Pages**.
+
+### High-level diagram (ASCII)
+
+```
+                         ┌─────────────────────────────────────┐
+                         │  Browser (user)                     │
+                         │  SPA: vanilla JS on GitHub Pages   │
+                         │  • REST: schedules, fights, lists  │
+                         │  • WSS: live scoreboard / timer    │
+                         └────────────┬────────────┬──────────┘
+                                      │            │
+         HTTPS (CORS handled          │            │  WebSocket
+         at your edge)                │            │  (Origin handled
+                                      ▼            ▼  at your proxy)
+   ┌──────────────────────┐   ┌──────────────────────────────┐
+   │  HTTP proxy          │   │  WebSocket proxy (Node)       │
+   │  Cloudflare Worker   │   │  e.g. Render (see server/)     │
+   │  • allow browser     │   │  • accept client connection     │
+   │  • forward /api      │   │  • open upstream wss to MM      │
+   │    to martialmatch   │   │  • relay scoreboard channels    │
+   └──────────┬───────────┘   └──────────────┬──────────────────┘
+              │                              │
+              │   HTTPS to official API        │   WSS to official
+              ▼                              ▼   scoreboard
+   ┌──────────────────────────────────────────────────────────┐
+   │  martialmatch.com  (target: REST + real-time data)     │
+   └──────────────────────────────────────────────────────────┘
+```
+
+The browser talks only to **your** Worker and **your** `wss://` host; both components then reach the real site on your behalf.
+
 ## For developers
 
 Use "mode=test" in query URL parameters to simulate data with active competitions. 
