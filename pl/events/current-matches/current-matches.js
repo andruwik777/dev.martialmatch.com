@@ -3809,6 +3809,14 @@
         t && !isNaN(t.getTime()) ? timeFmt.format(t) : "—";
       mid.appendChild(timeSpan);
 
+      if (Number(pf.bracketType) === 4) {
+        var rrBadge = document.createElement("span");
+        rrBadge.className = "mm-fight__rb mm-fight__rb--rr";
+        rrBadge.textContent = "RR";
+        rrBadge.setAttribute("title", "Round robin");
+        mid.appendChild(rrBadge);
+      }
+
       roundBadgeList(pf).forEach(function (b) {
         var badge = document.createElement("span");
         badge.className =

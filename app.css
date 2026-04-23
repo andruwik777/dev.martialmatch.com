@@ -1020,6 +1020,12 @@ body {
   color: #f0fff4;
 }
 
+/* Round robin (bracketType 4 in API) */
+.mm-fight__rb--rr {
+  background: #2f855a;
+  color: #f0fff4;
+}
+
 .mm-fight__rb--final {
   background: #9b2c2c;
   color: #fff5f5;
@@ -1070,6 +1076,11 @@ body {
 
 .mm-fight__topbar--active .mm-fight__rb--round {
   background: #22543d;
+  color: #f0fff4;
+}
+
+.mm-fight__topbar--active .mm-fight__rb--rr {
+  background: #1c4532;
   color: #f0fff4;
 }
 
