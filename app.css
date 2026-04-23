@@ -924,8 +924,12 @@ body {
   gap: 0.1rem;
 }
 
+/* Keep layout size when WSS not yet active (no jump on first message) */
 .mm-fight__wss-race[hidden] {
-  display: none !important;
+  display: inline-flex !important;
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
 }
 
 .mm-fight__wss-flag {
@@ -1138,7 +1142,10 @@ body {
 }
 
 .mm-fight__wss-pair[hidden] {
-  display: none !important;
+  display: flex !important;
+  visibility: hidden;
+  pointer-events: none;
+  user-select: none;
 }
 
 .mm-fight__wss-tile {
