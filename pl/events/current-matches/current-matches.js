@@ -782,7 +782,7 @@
       list.push({ text: "3rd", variant: "third" });
     else if (rnl === "repechage") list.push({ text: "REP", variant: "round" });
     else if (rn === "1/8" || rnl.indexOf("1/8") === 0)
-      list.push({ text: "1/8", variant: "round" });
+      list.push({ text: "1/8", variant: "neutral" });
     else if (rn === "1/4" || rnl.indexOf("1/4") === 0)
       list.push({ text: "1/4", variant: "round" });
     else if (rnl.indexOf("1/2") === 0)
