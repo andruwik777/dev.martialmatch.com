@@ -38,6 +38,7 @@
   var tabFightsBtn = document.getElementById("mm-cm-tab-fights");
   var tabHarmonogramBtn = document.getElementById("mm-cm-tab-harmonogram");
   var tabFightsLabelEl = document.getElementById("mm-cm-tab-fights-label");
+  var tabFightsRefreshEl = document.getElementById("mm-cm-tab-fights-refresh");
   var panelEventsEl = document.getElementById("mm-cm-panel-events");
   var panelFightsEl = document.getElementById("mm-cm-panel-fights");
   var panelHarmonogramEl = document.getElementById("mm-cm-panel-harmonogram");
@@ -100,12 +101,10 @@
 
   var matNamesById = Object.create(null);
   var pollTimerId = null;
-  /** @type {number|null} */
-  var fightsTabCountdownId = null;
   var fightsPollingActive = false;
-  /** @type {number|null} seconds until next poll (only while fightsPollingActive) */
-  var fightsTabSecondsLeft = null;
   var fightsTabStats = { shown: 0, total: 0 };
+  /** In-flight fetchJson(fights) count; show tab refresh icon when non-zero */
+  var fightsLoadInflight = 0;
   /** @type {object | null} ostatnia poprawna odpowiedź /api/.../fights */
   var lastFightsData = null;
 
@@ -2094,10 +2093,6 @@
     updateFightsTabLabel();
   }
 
-  function getFightsRefreshPeriodSec() {
-    return Math.max(1, Math.round((cfg.currentMatchesRefreshMs || 30000) / 1000));
-  }
-
   function clearWssFightsRefetchDebounce() {
     if (cmWssFightsRefetchDebounce != null) {
       clearTimeout(cmWssFightsRefetchDebounce);
@@ -2105,17 +2100,8 @@
     }
   }
 
-  function resetFightsPollCountdown() {
-    if (!fightsPollingActive) {
-      return;
-    }
-    fightsTabSecondsLeft = getFightsRefreshPeriodSec();
-    updateFightsTabLabel();
-  }
-
   function scheduleFightsRefetchFromWss() {
     clearWssFightsRefetchDebounce();
-    resetFightsPollCountdown();
     cmWssFightsRefetchDebounce = window.setTimeout(function () {
       cmWssFightsRefetchDebounce = null;
       if (!evSlug || getCmTabFromUrl() !== CM_TAB_FIGHTS) {
@@ -2125,6 +2111,21 @@
         /* keep previous list */
       });
     }, 250);
+  }
+
+  function syncFightsTabRefreshUi() {
+    if (!tabFightsBtn) {
+      return;
+    }
+    var on = fightsLoadInflight > 0;
+    if (tabFightsRefreshEl) {
+      tabFightsRefreshEl.hidden = !on;
+    }
+    if (on) {
+      tabFightsBtn.setAttribute("aria-busy", "true");
+    } else {
+      tabFightsBtn.removeAttribute("aria-busy");
+    }
   }
 
   function updateFightsTabLabel() {
@@ -2140,18 +2141,14 @@
     var slugFilter = getSlugFilterIdSetFromUrl();
     var filtered =
       Boolean(slugFilter && Object.keys(slugFilter).length);
-    var parens =
-      fightsPollingActive && fightsTabSecondsLeft != null
-        ? " (" + fightsTabSecondsLeft + "s)"
-        : "";
     var body = filtered ? "Fights " + s + "/" + t : "Fights " + t;
-    if (tabFightsLabelEl) tabFightsLabelEl.textContent = body + parens;
-    else tabFightsBtn.textContent = body + parens;
+    if (tabFightsLabelEl) tabFightsLabelEl.textContent = body;
+    else tabFightsBtn.textContent = body;
     var aria = filtered
       ? "Fights tab, " + s + " of " + t + " fights match filter"
       : "Fights tab, " + t + " fights";
-    if (fightsPollingActive && fightsTabSecondsLeft != null) {
-      aria += ", next refresh in " + fightsTabSecondsLeft + " seconds";
+    if (fightsLoadInflight > 0) {
+      aria += ", loading list";
     }
     tabFightsBtn.setAttribute("aria-label", aria);
   }
@@ -3713,15 +3710,10 @@
 
   function stopPoll() {
     fightsPollingActive = false;
-    fightsTabSecondsLeft = null;
     clearWssFightsRefetchDebounce();
     if (pollTimerId !== null) {
       clearInterval(pollTimerId);
       pollTimerId = null;
-    }
-    if (fightsTabCountdownId !== null) {
-      clearInterval(fightsTabCountdownId);
-      fightsTabCountdownId = null;
     }
     updateFightsTabLabel();
   }
@@ -3753,7 +3745,6 @@
       listEl.appendChild(emptyF);
       fightsTabStats.shown = 0;
       fightsTabStats.total = 0;
-      fightsTabSecondsLeft = getFightsRefreshPeriodSec();
       updateFightsTabLabel();
       if (evSlug && getCmTabFromUrl() === CM_TAB_FIGHTS && cmWssUrlOk()) {
         cmWssResyncSubscriptionFromFights();
@@ -3871,7 +3862,6 @@
 
     fightsTabStats.shown = rows.length;
     fightsTabStats.total = allRows.length;
-    fightsTabSecondsLeft = getFightsRefreshPeriodSec();
     updateFightsTabLabel();
     if (evSlug && getCmTabFromUrl() === CM_TAB_FIGHTS && cmWssUrlOk()) {
       cmWssConnect();
@@ -3895,6 +3885,9 @@
   }
 
   function loadFights() {
+    fightsLoadInflight++;
+    syncFightsTabRefreshUi();
+    updateFightsTabLabel();
     return fetchJson(fightsUrl(eventNumericId))
       .then(function (data) {
         clearError();
@@ -3917,6 +3910,11 @@
           }
         }
         throw err;
+      })
+      .finally(function () {
+        fightsLoadInflight = Math.max(0, fightsLoadInflight - 1);
+        syncFightsTabRefreshUi();
+        updateFightsTabLabel();
       });
   }
 
@@ -3924,16 +3922,6 @@
     stopPoll();
     fightsPollingActive = true;
     var ms = cfg.currentMatchesRefreshMs || 30000;
-    var periodSec = getFightsRefreshPeriodSec();
-    if (fightsTabSecondsLeft == null) {
-      fightsTabSecondsLeft = periodSec;
-    }
-    fightsTabCountdownId = window.setInterval(function () {
-      if (fightsTabSecondsLeft != null && fightsTabSecondsLeft > 0) {
-        fightsTabSecondsLeft--;
-      }
-      updateFightsTabLabel();
-    }, 1000);
     pollTimerId = window.setInterval(function () {
       loadFights().catch(function () {
         /* zostaw poprzednią listę */

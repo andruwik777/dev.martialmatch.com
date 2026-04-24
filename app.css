@@ -548,6 +548,38 @@ body {
 
 .mm-cm-tab--fights {
   flex: 2 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.mm-cm-tab__refresh {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 0.875rem;
+  height: 0.875rem;
+  line-height: 0;
+  color: inherit;
+  opacity: 0.9;
+  vertical-align: middle;
+}
+
+.mm-cm-tab__refresh[hidden] {
+  display: none;
+}
+
+.mm-cm-tab-refresh-ic {
+  display: block;
+  animation: mm-cm-refresh-spin 0.7s linear infinite;
+}
+
+@keyframes mm-cm-refresh-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .mm-cm-tab__label {
