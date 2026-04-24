@@ -159,6 +159,20 @@ After changing fixtures, run the script, commit `data/`, push, then the test Wor
 
 8. **MartialMatch API + `mode=test`** — Starting lists (participants by category) moved from **HTML** to **JSON**; the viewer had to consume the new shape, and **`mode=test`** needed the same — including **adapting fixtures** (JSON snapshots / conversion from legacy HTML) so the test Worker still serves coherent data.
 
+9. **Multi-day events — category schedule on the Schedule tab** — The harmonogram/schedule view shows **per-day / per-window category block timing** for competitions that span multiple days, so the long schedule stays readable (not a single undifferentiated wall of rows).
+
+10. **WebSocket proxy for live scoreboard** — A small **Node** `wss://` proxy in this repo (see [server/README-wss.md](server/README-wss.md) and `WSS_BASE_BY_MODE` in [config.js](config.js)) is required because the **official scoreboard** updates over **WebSocket** (time, points, status, etc.), which the static GitHub Pages origin cannot use directly.
+
+11. **“Observer” / fan-out on the WebSocket proxy** — The proxy maintains **one upstream socket** to MartialMatch and, for each **scoreboard channel** clients subscribe to, **broadcasts** each upstream message to **every** connected browser that asked for that channel. One upstream message can therefore update many interested clients efficiently.
+
+12. **Autodeploy for three environments** — **Front end:** this repo on **GitHub Pages** (free; **dev** and **dev-test** on `master`, **prod** from the separate release repo/branch as documented above). **HTTP** proxy: **Cloudflare Workers** (free tiers). **WebSocket** proxy: the Node service on **Render** (free tier) — all three can track pushes so a full-stack change can roll out in parallel when you need it.
+
+13. **Render *root directory* vs Cloudflare *every push*** — If you set a [root directory](https://render.com/docs/monorepo-support#setting-a-root-directory) for the WebSocket service, Render’s **autodeploy only runs when changed files fall under that directory**; changes elsewhere in a monorepo are ignored. **Cloudflare Workers** tied to the repo typically **redeploy on any push** to the watched branch. Know which half of the stack is “noisy” when you monorepo other code next to the proxy.
+
+14. **Connection lifetime vs the official upstream** — The custom WebSocket proxy does **not** drop browser connections on a **~1 minute** cadence the way the original upstream behavior can feel like; it **tracks subscriptions** and **prunes** clients that have actually disconnected so resources do not leak.
+
+15. **Debug-level UI: HTTP refresh + WSS “traffic”** — On the **Fights** tab, **spinning** refresh by the label reflects **in-flight** `/fights` fetches, and a **small status dot** reflects connection state; a **throttled** neutral pulse on send/receive helps confirm live WSS **without** flooding the screen during busy mats.
+
 ## Releasing a new version (dev → prod)
 
 **Dev repo:** [github.com/andruwik777/dev.martialmatch.com](https://github.com/andruwik777/dev.martialmatch.com)  
