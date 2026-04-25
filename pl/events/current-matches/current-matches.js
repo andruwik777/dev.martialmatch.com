@@ -3790,6 +3790,13 @@
     if (tab === CM_TAB_EVENTS) {
       refreshEventsListVisibility();
     } else {
+      if (tab === CM_TAB_FIGHTS) {
+        /**
+         * Filter apply can radically change visible rows. Drop live WSS cache to avoid
+         * briefly reapplying stale mat+fight overlays during list rebuild.
+         */
+        cmWssInvalidateLiveCacheAndOverlays();
+      }
       if (lastFightsData) {
         renderFights(lastFightsData);
       }
