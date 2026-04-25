@@ -2953,10 +2953,9 @@
     });
     tabFightsBtn.addEventListener("click", function () {
       if (!evSlug) return;
-      if (getCmTabFromUrl() === CM_TAB_FIGHTS) {
-        return;
+      if (getCmTabFromUrl() !== CM_TAB_FIGHTS) {
+        setCmTab(CM_TAB_FIGHTS);
       }
-      setCmTab(CM_TAB_FIGHTS);
       loadFights().catch(function () {
         /* zostaw poprzednią listę */
       });
