@@ -2354,6 +2354,12 @@
     if (origMmLinkEl && typeof cfg.martialMatchEventUrl === "function") {
       if (evSlug) {
         var mmUrl = cfg.martialMatchEventUrl(evSlug.slug);
+        var tab = getCmTabFromUrl();
+        if (tab === CM_TAB_FIGHTS) {
+          mmUrl += "/current-matches";
+        } else if (tab === CM_TAB_HARMONOGRAM) {
+          mmUrl += "/schedules";
+        }
         origMmLinkEl.href = mmUrl;
         origMmLinkEl.setAttribute("title", mmUrl);
         origMmLinkEl.classList.remove("is-hidden");
