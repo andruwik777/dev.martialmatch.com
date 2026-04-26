@@ -6,7 +6,7 @@ A lightweight web front end for [martialmatch.com](https://martialmatch.com) dat
 
 [![Watch the video](https://i.sstatic.net/Vp2cE.png)](https://youtu.be/vt5fpE0bzSY)
 
-[![Watch the video](https://github.com/andruwik777/dev.martialmatch.com/blob/master/demo.jpg)](https://www.youtube.com/shorts/vE49NYUGRHg)
+[![Watch the video](https://github.com/andruwik777/dev.martialmatch.com/blob/master/Screenshot_20260426_133926_Video%20Player.jpg)](https://www.youtube.com/shorts/vE49NYUGRHg)
 
 <p align="center">
   <video src="./Screen_Recording_20260426_124402_Chrome.mp4" width="45%" style="display:inline-block; margin-right: 10px;"/>
