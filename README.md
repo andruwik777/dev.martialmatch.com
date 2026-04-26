@@ -4,6 +4,10 @@ A lightweight web front end for [martialmatch.com](https://martialmatch.com) dat
 
 **Live site (Stable):** [andruwik777.github.io/martialmatch.com](https://andruwik777.github.io/martialmatch.com)
 
+[![Watch the video](https://i.sstatic.net/Vp2cE.png)](https://youtu.be/vt5fpE0bzSY)
+
+[![Watch the video](https://github.com/andruwik777/dev.martialmatch.com/blob/master/demo.jpg)](https://www.youtube.com/shorts/vE49NYUGRHg)
+
 <p align="center">
   <video src="./Screen_Recording_20260426_124402_Chrome.mp4" width="45%" style="display:inline-block; margin-right: 10px;"/>
 </p>
