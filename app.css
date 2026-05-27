@@ -757,11 +757,12 @@ body {
 
 .mm-cm-header-nav {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.35rem 0.5rem;
+  gap: 0.35rem clamp(0.35rem, 2vw, 0.85rem);
   width: 100%;
+  min-width: 0;
 }
 
 .mm-cm-header-nav .mm-nav-link {
@@ -771,21 +772,41 @@ body {
 .mm-cm-header-nav__home,
 .mm-cm-header-nav__help,
 .mm-cm-header-nav__share {
-  flex-shrink: 0;
+  flex: 0 0 auto;
 }
 
 .mm-cm-header-nav__share {
   margin: 0;
   padding: 0;
   font: inherit;
-  background: none;
-  border: none;
+  font-size: inherit;
+  line-height: 1.45;
+  color: #7aa8ff;
+  background: transparent;
+  background-color: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 0;
+  min-height: 0;
+  width: auto;
+  white-space: nowrap;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
 
 .mm-cm-header-nav__share:hover {
+  color: #7aa8ff;
   text-decoration: underline;
+  background: transparent;
+}
+
+.mm-cm-header-nav__share:active,
+.mm-cm-header-nav__share:focus {
+  background: transparent;
+  background-color: transparent;
 }
 
 .mm-cm-header-nav__share:focus-visible {
@@ -796,14 +817,16 @@ body {
 
 .mm-cm-header-orig-link {
   display: inline-block;
-  flex: 0 1 auto;
+  flex: 1 1 auto;
   min-width: 0;
-  max-width: 46%;
+  max-width: min(46%, 14rem);
+  margin: 0 auto;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 1.45;
   vertical-align: middle;
+  text-align: center;
 }
 
 .mm-cm-header-context {
