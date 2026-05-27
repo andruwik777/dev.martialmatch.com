@@ -924,11 +924,6 @@
     );
   }
 
-  function formatCategoryDisplay(cat) {
-    if (!cat) return "";
-    return String(cat).replace(/;/g, " ").replace(/\s+/g, " ").trim();
-  }
-
   /**
    * publicFight.bracketType — integer from MartialMatch fights JSON (not documented
    * in public API). Inferred from real UI + `fights.html` (CSS class names) for event
@@ -4162,7 +4157,7 @@
       row1.appendChild(right);
       topbar.appendChild(row1);
 
-      var cat = formatCategoryDisplay(pf.category);
+      var cat = pf.category ? String(pf.category).trim() : "";
       if (cat) {
         var row2 = document.createElement("div");
         row2.className = "mm-fight__topbar-row2";
