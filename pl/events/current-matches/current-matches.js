@@ -2565,6 +2565,12 @@
         }
       }
     }
+    if (
+      window.MM_PWA &&
+      typeof window.MM_PWA.repositionInstallButton === "function"
+    ) {
+      window.MM_PWA.repositionInstallButton();
+    }
   }
 
   function notifyUrlChanged() {

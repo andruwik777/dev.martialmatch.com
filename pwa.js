@@ -77,19 +77,51 @@
       return;
     }
     installBtn.hidden = false;
-    positionInstallButton();
+    scheduleRepositionInstallButton();
+  }
+
+  function isVisibleEl(el) {
+    if (!el || el.hidden) return false;
+    if (el.classList && el.classList.contains("is-hidden")) return false;
+    var r = el.getBoundingClientRect();
+    return r.width > 0 && r.height > 0;
+  }
+
+  /** Vertical anchor: middle of active-event header card, else below nav. */
+  function installAnchorRect() {
+    var wrap = document.getElementById("mm-cm-header-card-wrap");
+    if (isVisibleEl(wrap)) {
+      var row =
+        wrap.querySelector(".mm-event-row--header-compact") ||
+        wrap.querySelector(".mm-event-row");
+      if (isVisibleEl(row)) return row.getBoundingClientRect();
+      return wrap.getBoundingClientRect();
+    }
+    var nav = document.querySelector(".mm-cm-header-nav");
+    if (isVisibleEl(nav)) return nav.getBoundingClientRect();
+    return null;
   }
 
   function positionInstallButton() {
     if (!installBtn) return;
-    var hdr = document.querySelector(".header.mm-cm-page-header");
+    var anchor = installAnchorRect();
+    var btnH =
+      installBtn.getBoundingClientRect().height ||
+      installBtn.offsetHeight ||
+      44;
     var topPx = 8;
-    if (hdr) {
-      var rect = hdr.getBoundingClientRect();
-      topPx = Math.max(8, Math.round(rect.bottom + 8));
+    if (anchor && anchor.height > 0) {
+      topPx = Math.round(anchor.top + anchor.height / 2 - btnH / 2);
     }
+    topPx = Math.max(8, topPx);
     installBtn.style.top =
       "max(" + topPx + "px, calc(0.5rem + env(safe-area-inset-top, 0px)))";
+  }
+
+  function scheduleRepositionInstallButton() {
+    global.requestAnimationFrame(function () {
+      global.requestAnimationFrame(positionInstallButton);
+    });
   }
 
   function buildInstallButton() {
@@ -118,8 +150,8 @@
     });
 
     document.body.appendChild(installBtn);
-    global.addEventListener("resize", positionInstallButton);
-    global.addEventListener("orientationchange", positionInstallButton);
+    global.addEventListener("resize", scheduleRepositionInstallButton);
+    global.addEventListener("orientationchange", scheduleRepositionInstallButton);
   }
 
   function registerServiceWorker() {
@@ -177,6 +209,7 @@
 
   global.MM_PWA = {
     notifyTabChange: onTabChanged,
+    repositionInstallButton: scheduleRepositionInstallButton,
     repoBasePath: repoBasePath,
   };
 
