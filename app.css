@@ -760,7 +760,6 @@ body {
   flex-wrap: nowrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.35rem clamp(0.35rem, 2vw, 0.85rem);
   width: 100%;
   min-width: 0;
 }
@@ -817,16 +816,14 @@ body {
 
 .mm-cm-header-orig-link {
   display: inline-block;
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-width: 0;
-  max-width: min(46%, 14rem);
-  margin: 0 auto;
+  max-width: 42%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   line-height: 1.45;
   vertical-align: middle;
-  text-align: center;
 }
 
 .mm-cm-header-context {
