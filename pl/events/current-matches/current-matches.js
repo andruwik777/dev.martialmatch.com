@@ -2905,6 +2905,9 @@
       refreshHarmonogram();
     }
     updatePollingForTab();
+    if (window.MM_PWA && typeof window.MM_PWA.notifyTabChange === "function") {
+      window.MM_PWA.notifyTabChange(tab);
+    }
   }
 
   function setCmTab(tab) {
