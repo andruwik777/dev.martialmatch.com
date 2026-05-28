@@ -1911,6 +1911,47 @@
     }
   }
 
+  /**
+   * Home reset: drop per-event API bundle + lane dots; keep list card metadata from index.
+   */
+  function resetEventApiCacheForHome() {
+    aggregateParticipantMapsPromise = null;
+    for (var ek in eventParticipantIdMap) {
+      delete eventParticipantIdMap[ek];
+    }
+    if (parsedEventsList.length) {
+      for (var ti = 0; ti < parsedEventsList.length; ti++) {
+        var evo = parsedEventsList[ti];
+        var enid = evo.numericId;
+        eventCache[enid] = {
+          title: evo.title || "",
+          registration: evo.registration,
+          dateText: evo.dateText || "",
+          place: evo.place || "",
+          countryCode: evo.countryCode || "",
+          thumb: evo.thumb || "",
+          tags: evo.tags || [],
+        };
+        refreshLanesForNumericId(enid);
+      }
+      return;
+    }
+    for (var nid in eventCache) {
+      if (!Object.prototype.hasOwnProperty.call(eventCache, nid)) continue;
+      var prev = eventCache[nid];
+      eventCache[nid] = {
+        title: prev.title || "",
+        registration: prev.registration,
+        dateText: prev.dateText || "",
+        place: prev.place || "",
+        countryCode: prev.countryCode || "",
+        thumb: prev.thumb || "",
+        tags: prev.tags || [],
+      };
+      refreshLanesForNumericId(nid);
+    }
+  }
+
   function buildEventThumbPlaceholder() {
     var ph = document.createElement("div");
     ph.className = "mm-event-thumb-placeholder";
@@ -2531,6 +2572,7 @@
     p.set("tab", "events");
     replaceLocationQuery(p);
 
+    resetEventApiCacheForHome();
     lastFightsData = null;
     lastSchedulesPayload = null;
     startingListEntries = null;
@@ -2549,7 +2591,8 @@
     if (parsedEventsList.length) {
       activateEventSlug(
         cfg.parseEventSlug(parsedEventsList[0].slug),
-        CM_TAB_EVENTS
+        CM_TAB_EVENTS,
+        { forceReload: true }
       );
       return;
     }
@@ -2739,16 +2782,21 @@
       });
   }
 
-  function ensureEventLoaded(slugObj) {
+  function ensureEventLoaded(slugObj, loadOpts) {
     var nid = slugObj.numericId;
-    if (eventCache[nid] && eventCache[nid].loaded) {
+    var forceReload = loadOpts && loadOpts.forceReload;
+    if (
+      !forceReload &&
+      eventCache[nid] &&
+      eventCache[nid].loaded
+    ) {
       applyCachedEventToView(nid);
       return Promise.resolve();
     }
     return loadEventBundle(slugObj);
   }
 
-  function activateEventSlug(slugObj, preferredTab) {
+  function activateEventSlug(slugObj, preferredTab, loadOpts) {
     var tab =
       preferredTab == null ? CM_TAB_EVENTS : preferredTab;
     closeFilterPanel();
@@ -2765,7 +2813,7 @@
       placeholderEl.textContent = "Loading…";
     }
     clearError();
-    return ensureEventLoaded(slugObj)
+    return ensureEventLoaded(slugObj, loadOpts)
       .then(function () {
         syncHeaderEventLine();
         if (placeholderEl) placeholderEl.classList.add("is-hidden");
