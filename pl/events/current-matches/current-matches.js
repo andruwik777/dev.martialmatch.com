@@ -995,6 +995,47 @@
     return name || "—";
   }
 
+  /** Easter egg: random emoji after exact family first+last names (filter rows and fight cards). */
+  var FAMILY_EMOJI_POOL = [
+    "🥋",
+    "🤼",
+    "💪",
+    "🏆",
+    "🔥",
+    "👊",
+    "⭐",
+    "🐻",
+    "🐱",
+    "🐾",
+    "✨",
+    "🙂",
+    "😊",
+    "😄",
+    "😎",
+  ];
+  var FAMILY_NAMES = {
+    "Mykhailo Petrov": true,
+    "Anna Petrova": true,
+  };
+
+  function isFamilyDisplayName(name) {
+    var s = String(name != null ? name : "")
+      .replace(/\s+/g, " ")
+      .trim();
+    return Boolean(FAMILY_NAMES[s]);
+  }
+
+  function pickRandomFamilyEmoji() {
+    return FAMILY_EMOJI_POOL[
+      Math.floor(Math.random() * FAMILY_EMOJI_POOL.length)
+    ];
+  }
+
+  function displayNameWithFamilyEmoji(name) {
+    if (!isFamilyDisplayName(name)) return name;
+    return name + " " + pickRandomFamilyEmoji();
+  }
+
   /**
    * Canonical club line: "academyName / academyBranch" (aligned with starting-list JSON).
    */
@@ -1083,7 +1124,7 @@
     var nm = document.createElement("span");
     nm.className = "mm-fight__name";
     var dn = competitorDisplayName(c);
-    nm.textContent = dn;
+    nm.textContent = displayNameWithFamilyEmoji(dn);
     if (/^--/.test(String(dn).trim())) {
       nm.classList.add("mm-muted", "mm-fight__name--placeholder");
     }
@@ -3614,7 +3655,7 @@
 
         var nameEl = document.createElement("div");
         nameEl.className = "mm-filter-row__name";
-        nameEl.textContent = item.name;
+        nameEl.textContent = displayNameWithFamilyEmoji(item.name);
         if (dqNoPay) {
           if (blockDqNoPayUi) {
             nameEl.setAttribute(
