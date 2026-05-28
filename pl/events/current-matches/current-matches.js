@@ -2518,6 +2518,60 @@
     stopPoll();
   }
 
+  /**
+   * Home: reset slug + filters, Events tab, replaceState (no history stack entry).
+   * Matches a fresh ?tab=events load: first event is activated when the list exists.
+   */
+  function goHome() {
+    closeFilterPanel();
+    var p = new URLSearchParams(window.location.search);
+    p.delete("slug");
+    p.delete(URL_PARAM_SLUG_FILTER);
+    p.delete(URL_PARAM_EVENTS_FILTER);
+    p.set("tab", "events");
+    replaceLocationQuery(p);
+
+    lastFightsData = null;
+    lastSchedulesPayload = null;
+    startingListEntries = null;
+    matNamesById = Object.create(null);
+    startingListLoadPromise = null;
+    cmWssInvalidateLiveCacheAndOverlays();
+    renderFights(null);
+    if (listEl) listEl.innerHTML = "";
+    if (toolbarEl) {
+      toolbarEl.classList.add("is-hidden");
+      toolbarEl.textContent = "";
+    }
+    refreshHarmonogram();
+    clearError();
+
+    if (parsedEventsList.length) {
+      activateEventSlug(
+        cfg.parseEventSlug(parsedEventsList[0].slug),
+        CM_TAB_EVENTS
+      );
+      return;
+    }
+
+    notifyUrlChanged();
+    applyCmTabDom(CM_TAB_EVENTS);
+    highlightSelectedEventRow("");
+    refreshEventsListVisibility();
+    updateFilterMainButtonLabel();
+    stopPoll();
+    syncHeaderEventLine();
+  }
+
+  var homeNavBtn = document.getElementById("mm-cm-nav-home");
+
+  function initHomeNav() {
+    if (!homeNavBtn) return;
+    homeNavBtn.addEventListener("click", function () {
+      goHome();
+    });
+  }
+
   function syncHeaderEventLine() {
     if (origMmLinkEl && typeof cfg.martialMatchEventUrl === "function") {
       if (evSlug) {
@@ -4402,6 +4456,7 @@
   }
 
   initCmTabsFromUrl();
+  initHomeNav();
   initShareNav();
   updateFilterRootVisibility();
   updateFilterMainButtonLabel();
