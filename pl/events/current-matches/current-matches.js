@@ -3715,9 +3715,11 @@
     var preset = getApplicableFavoritesPresetIdSet();
     var presetN = filterIdSetKeyCount(preset);
     var favTotal = filterIdSetKeyCount(loadFavoritesIdSet());
-    var filled = filterPanelOpen
-      ? panelCheckboxesMatchFavoritesPreset()
-      : committedFilterMatchesFavoritesPreset();
+    var filled =
+      presetN > 0 &&
+      (filterPanelOpen
+        ? panelCheckboxesMatchFavoritesPreset()
+        : committedFilterMatchesFavoritesPreset());
     filterFavoritesPresetBtn.classList.toggle("is-active", filled);
     filterFavoritesPresetBtn.setAttribute(
       "aria-pressed",
