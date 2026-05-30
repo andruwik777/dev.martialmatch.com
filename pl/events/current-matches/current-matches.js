@@ -67,6 +67,7 @@
 
   var URL_PARAM_EVENTS_FILTER = "events_filter";
   var URL_PARAM_SLUG_FILTER = "slug_filter";
+  var FAVORITES_LS_KEY = "mm_cm_favorites_v1";
 
   var eventCache = Object.create(null);
   var parsedEventsList = [];
@@ -104,6 +105,9 @@
     "mm-filter-clear-all-btn-mobile"
   );
   var filterOnlySelectedCb = document.getElementById("mm-filter-only-selected-cb");
+  var filterFavoritesPresetBtn = document.getElementById(
+    "mm-filter-favorites-preset-btn"
+  );
   var filterOnlyEmptyHintEl = document.getElementById("mm-filter-only-empty-hint");
   var filterSearchInputEl = document.getElementById("mm-filter-search-input");
 
@@ -2361,6 +2365,7 @@
     refreshSlugFromLocation();
     refreshEventsListVisibility();
     updateFilterMainButtonLabel();
+    updateFilterFavoritesPresetToolbarUi();
   }
 
   function setEventsFilterQueryInUrl(idsUnique) {
@@ -2717,6 +2722,7 @@
     updateFilterRootVisibility();
     syncHeaderEventLine();
     updateEventsToolbarUi();
+    updateFilterFavoritesPresetToolbarUi();
   }
 
   function applyCachedEventToView(nid) {
@@ -3518,6 +3524,278 @@
     }
   }
 
+  /** @returns {Record<string, true>} */
+  function loadFavoritesIdSet() {
+    try {
+      var raw = localStorage.getItem(FAVORITES_LS_KEY);
+      if (!raw) return Object.create(null);
+      var parsed = JSON.parse(raw);
+      var ids = parsed && Array.isArray(parsed.ids) ? parsed.ids : [];
+      var out = Object.create(null);
+      for (var i = 0; i < ids.length; i++) {
+        var id = String(ids[i] || "").trim();
+        if (id) out[id] = true;
+      }
+      return out;
+    } catch (err) {
+      return Object.create(null);
+    }
+  }
+
+  function persistFavoritesIdSet(idSet) {
+    var ids = Object.keys(idSet || Object.create(null));
+    ids.sort(function (a, b) {
+      return enCollator.compare(a, b);
+    });
+    try {
+      localStorage.setItem(
+        FAVORITES_LS_KEY,
+        JSON.stringify({ v: 1, ids: ids })
+      );
+    } catch (err) {
+      /* private mode / quota */
+    }
+  }
+
+  function isPublicIdFavorite(publicId) {
+    if (!publicId) return false;
+    var set = loadFavoritesIdSet();
+    return Boolean(set[publicId]);
+  }
+
+  /** @returns {boolean} new favorite state */
+  function toggleFavoritePublicId(publicId) {
+    if (!publicId) return false;
+    var set = loadFavoritesIdSet();
+    if (set[publicId]) {
+      delete set[publicId];
+      persistFavoritesIdSet(set);
+      return false;
+    }
+    set[publicId] = true;
+    persistFavoritesIdSet(set);
+    return true;
+  }
+
+  function filterIdSetKeyCount(idSet) {
+    if (!idSet) return 0;
+    return Object.keys(idSet).length;
+  }
+
+  function filterIdSetsEqual(a, b) {
+    var na = filterIdSetKeyCount(a);
+    var nb = filterIdSetKeyCount(b);
+    if (na !== nb) return false;
+    if (!na) return true;
+    for (var k in a) {
+      if (!b[k]) return false;
+    }
+    return true;
+  }
+
+  /** Public IDs currently listed in the open filter panel. */
+  function getFilterListMemberPublicIds() {
+    var out = Object.create(null);
+    if (!filterListRootEl) return out;
+    var boxes = filterListRootEl.querySelectorAll(
+      'input[type="checkbox"][data-mm-filter-member]'
+    );
+    for (var i = 0; i < boxes.length; i++) {
+      var v = boxes[i].value;
+      if (v) out[v] = true;
+    }
+    return out;
+  }
+
+  /** Favorites that appear on the current filter list. */
+  function getFilterListContextPublicIds() {
+    if (getCmTabFromUrl() === CM_TAB_EVENTS) {
+      var entries = buildAggregateFilterEntries();
+      var out = Object.create(null);
+      for (var i = 0; i < entries.length; i++) {
+        out[entries[i].publicId] = true;
+      }
+      return out;
+    }
+    return buildActiveEventPublicIdLookup() || Object.create(null);
+  }
+
+  /** Favorites that appear on the current filter list. */
+  function getApplicableFavoritesPresetIdSet() {
+    var fav = loadFavoritesIdSet();
+    var inList = getFilterListMemberPublicIds();
+    if (!filterIdSetKeyCount(inList)) {
+      inList = getFilterListContextPublicIds();
+    }
+    var out = Object.create(null);
+    for (var id in fav) {
+      if (inList[id]) out[id] = true;
+    }
+    return out;
+  }
+
+  /** @returns {Record<string, true>} */
+  function panelCheckboxIdSetFromDom() {
+    var ids = collectCheckedPublicIds();
+    var out = Object.create(null);
+    for (var i = 0; i < ids.length; i++) {
+      out[ids[i]] = true;
+    }
+    return out;
+  }
+
+  function getCommittedUrlFilterIdSet() {
+    if (getCmTabFromUrl() === CM_TAB_EVENTS) {
+      return getEventsFilterIdSetFromUrl() || Object.create(null);
+    }
+    return getSlugFilterIdSetFromUrl() || Object.create(null);
+  }
+
+  /** URL filter IDs effective on the current tab context. */
+  function getEffectiveCommittedFilterIdSet() {
+    var raw = getCommittedUrlFilterIdSet();
+    if (getCmTabFromUrl() === CM_TAB_EVENTS) {
+      return raw;
+    }
+    var inList = getFilterListMemberPublicIds();
+    if (!filterIdSetKeyCount(inList)) {
+      inList = buildActiveEventPublicIdLookup() || Object.create(null);
+    }
+    var out = Object.create(null);
+    for (var k in raw) {
+      if (inList[k]) out[k] = true;
+    }
+    return out;
+  }
+
+  function panelCheckboxesMatchFavoritesPreset() {
+    return filterIdSetsEqual(
+      panelCheckboxIdSetFromDom(),
+      getApplicableFavoritesPresetIdSet()
+    );
+  }
+
+  function committedFilterMatchesFavoritesPreset() {
+    return filterIdSetsEqual(
+      getEffectiveCommittedFilterIdSet(),
+      getApplicableFavoritesPresetIdSet()
+    );
+  }
+
+  function syncFilterFavoriteStarButtonUi(btn, isFavorite) {
+    if (!btn) return;
+    btn.classList.toggle("is-active", isFavorite);
+    btn.setAttribute("aria-pressed", isFavorite ? "true" : "false");
+    btn.setAttribute(
+      "aria-label",
+      isFavorite ? "Remove from favorites" : "Add to favorites"
+    );
+    var icon = btn.querySelector(".mm-filter-row__favorite-icon");
+    if (icon) {
+      icon.textContent = isFavorite ? "★" : "☆";
+    }
+  }
+
+  function makeFilterFavoriteStarButton(publicId, isFavorite) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "mm-filter-row__favorite-btn";
+    btn.setAttribute("data-mm-filter-favorite", "1");
+    btn.setAttribute("data-public-id", publicId);
+    btn.innerHTML =
+      '<span class="mm-filter-row__favorite-icon" aria-hidden="true">' +
+      (isFavorite ? "★" : "☆") +
+      "</span>";
+    syncFilterFavoriteStarButtonUi(btn, isFavorite);
+    return btn;
+  }
+
+  function updateFilterFavoritesPresetToolbarUi() {
+    if (!filterFavoritesPresetBtn) return;
+    var preset = getApplicableFavoritesPresetIdSet();
+    var presetN = filterIdSetKeyCount(preset);
+    var favTotal = filterIdSetKeyCount(loadFavoritesIdSet());
+    var filled = filterPanelOpen
+      ? panelCheckboxesMatchFavoritesPreset()
+      : committedFilterMatchesFavoritesPreset();
+    filterFavoritesPresetBtn.classList.toggle("is-active", filled);
+    filterFavoritesPresetBtn.setAttribute(
+      "aria-pressed",
+      filled ? "true" : "false"
+    );
+    var icon = filterFavoritesPresetBtn.querySelector(
+      ".mm-filter-favorites-preset-btn__icon"
+    );
+    if (icon) {
+      icon.textContent = filled ? "★" : "☆";
+    }
+    var aria =
+      filled
+        ? "Favorites selection active — " +
+          presetN +
+          " on this list. Tap Apply Filter to save to URL."
+        : "Select favorites on this list (" +
+          presetN +
+          " of " +
+          favTotal +
+          " on list). Does not apply until Apply Filter.";
+    filterFavoritesPresetBtn.setAttribute("aria-label", aria);
+    filterFavoritesPresetBtn.title = aria;
+  }
+
+  function scrollToFirstCheckedFilterRow() {
+    if (!filterListRootEl) return;
+    var rows = filterListRootEl.querySelectorAll(".mm-filter-row");
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      if (
+        row.classList.contains(MM_ROW_FILTER_HIDDEN) ||
+        row.classList.contains(MM_ROW_SEARCH_HIDDEN)
+      ) {
+        continue;
+      }
+      var cb = row.querySelector(
+        'input[type="checkbox"][data-mm-filter-member]:checked'
+      );
+      if (cb) {
+        row.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        return;
+      }
+    }
+  }
+
+  function applyFavoritesPresetToPanelCheckboxes() {
+    if (!filterListRootEl) return false;
+    if (panelCheckboxesMatchFavoritesPreset()) {
+      return false;
+    }
+    var favTotal = filterIdSetKeyCount(loadFavoritesIdSet());
+    var preset = getApplicableFavoritesPresetIdSet();
+    if (!favTotal) {
+      if (filterPanelStatusEl) {
+        filterPanelStatusEl.textContent =
+          "No favorites yet — tap ☆ on an athlete.";
+      }
+    } else if (!filterIdSetKeyCount(preset) && filterPanelStatusEl) {
+      filterPanelStatusEl.textContent =
+        "None of your favorites are on this list.";
+    } else if (filterPanelStatusEl) {
+      filterPanelStatusEl.textContent = "";
+    }
+    var boxes = filterListRootEl.querySelectorAll(
+      'input[type="checkbox"][data-mm-filter-member]'
+    );
+    for (var i = 0; i < boxes.length; i++) {
+      var b = boxes[i];
+      b.checked = Boolean(preset[b.value]);
+    }
+    refreshAllClubHeaderCheckboxes();
+    applyFilterPanelListVisibility();
+    updateFilterFavoritesPresetToolbarUi();
+    scrollToFirstCheckedFilterRow();
+    return true;
+  }
+
   function onFilterListCheckboxChange(ev) {
     var t = ev.target;
     if (!t || t.type !== "checkbox" || !filterListRootEl) return;
@@ -3533,13 +3811,32 @@
       }
       setClubHeaderCheckboxAria(t);
       applyFilterPanelListVisibility();
+      updateFilterFavoritesPresetToolbarUi();
       return;
     }
 
     if (t.hasAttribute("data-mm-filter-member")) {
       updateClubHeaderCheckboxFromMembers(section);
       applyFilterPanelListVisibility();
+      updateFilterFavoritesPresetToolbarUi();
     }
+  }
+
+  function onFilterFavoriteStarClick(ev) {
+    var t = ev.target;
+    if (!t || !t.closest || !filterListRootEl) return;
+    var btn = t.closest("[data-mm-filter-favorite]");
+    if (!btn || !filterListRootEl.contains(btn)) return;
+    ev.preventDefault();
+    var publicId = btn.getAttribute("data-public-id");
+    if (!publicId) return;
+    var nowFav = toggleFavoritePublicId(publicId);
+    syncFilterFavoriteStarButtonUi(btn, nowFav);
+    updateFilterFavoritesPresetToolbarUi();
+  }
+
+  function onFilterFavoritesPresetButtonClick() {
+    applyFavoritesPresetToPanelCheckboxes();
   }
 
   function makeFilterDqNoPaymentIcon(ariaLabel, extraClass) {
@@ -3599,6 +3896,7 @@
         var dqNoPay = Boolean(item.isDisqualifiedForNoPayment);
         var row = document.createElement("div");
         row.className = "mm-filter-row";
+        row.setAttribute("data-mm-filter-public-id", item.publicId);
         row.setAttribute(
           "data-mm-filter-search",
           normalizeForFilterSearch(
@@ -3630,6 +3928,15 @@
           textWrap.appendChild(metaEl);
         }
 
+        var controlsWrap = document.createElement("div");
+        controlsWrap.className = "mm-filter-row__controls";
+        controlsWrap.appendChild(
+          makeFilterFavoriteStarButton(
+            item.publicId,
+            isPublicIdFavorite(item.publicId)
+          )
+        );
+
         var checkWrap = document.createElement("div");
         checkWrap.className = "mm-filter-row__check";
         if (dqNoPay) {
@@ -3656,9 +3963,10 @@
           cbPlain.setAttribute("data-mm-filter-member", "1");
           checkWrap.appendChild(cbPlain);
         }
+        controlsWrap.appendChild(checkWrap);
 
         row.appendChild(textWrap);
-        row.appendChild(checkWrap);
+        row.appendChild(controlsWrap);
         section.appendChild(row);
       }
 
@@ -3672,6 +3980,7 @@
       filterSearchInputEl.value = "";
     }
     applyFilterPanelListVisibility();
+    updateFilterFavoritesPresetToolbarUi();
   }
 
   function syncFilterCheckboxesFromUrl() {
@@ -3689,6 +3998,7 @@
     }
     refreshAllClubHeaderCheckboxes();
     applyFilterPanelListVisibility();
+    updateFilterFavoritesPresetToolbarUi();
   }
 
   function countEventsFilterIdsInUrl() {
@@ -3905,6 +4215,7 @@
     }
     setFilterMobileBarVisible(true);
     updateFilterMainButtonLabel();
+    updateFilterFavoritesPresetToolbarUi();
   }
 
   function closeFilterPanel() {
@@ -3921,6 +4232,7 @@
     }
     if (filterPanelStatusEl) filterPanelStatusEl.textContent = "";
     updateFilterMainButtonLabel();
+    updateFilterFavoritesPresetToolbarUi();
   }
 
   function collectCheckedPublicIds() {
@@ -4452,6 +4764,14 @@
 
   if (filterListRootEl) {
     filterListRootEl.addEventListener("change", onFilterListCheckboxChange);
+    filterListRootEl.addEventListener("click", onFilterFavoriteStarClick);
+  }
+
+  if (filterFavoritesPresetBtn) {
+    filterFavoritesPresetBtn.addEventListener(
+      "click",
+      onFilterFavoritesPresetButtonClick
+    );
   }
 
   if (filterClearAllBtn) {
@@ -4493,6 +4813,7 @@
   initShareNav();
   updateFilterRootVisibility();
   updateFilterMainButtonLabel();
+  updateFilterFavoritesPresetToolbarUi();
   syncHeaderEventLine();
 
   loadEventsIndex().then(function () {
