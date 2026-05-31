@@ -293,7 +293,7 @@ Work in the **dev** repo clone, on branch **`release`** (or create/update it fro
 
 One-liner release script (set the valid tag at the beginning): 
    ```bash
-   tag=v3.0.3 && git checkout release && cp README.md README.md.keep-ours && git merge master -X theirs -m "Merge master to release for release with tag $tag" && mv README.md.keep-ours README.md && git add README.md && git commit --amend --no-edit && git tag "$tag" && git push release-origin HEAD:release && git push release-origin "$tag" && git checkout master
+   tag=v3.0.4 && git checkout release && cp README.md README.md.keep-ours && git merge master -X theirs -m "Merge master to release for release with tag $tag" && mv README.md.keep-ours README.md && git add README.md && git commit --amend --no-edit && git tag "$tag" && git push release-origin HEAD:release && git push release-origin "$tag" && git checkout master
    ```
 
 9. **Cloudflare Worker (prod)** — easy to forget: **`git push` does not deploy the proxy.** After the release, copy the repo’s **`server/prod-martialmatch-v1/worker.js`** into the **`prod-martialmatch-v1`** Worker in the Cloudflare dashboard, then click **Deploy** so production matches what you ship in **`server/`**.  
