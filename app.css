@@ -2391,6 +2391,12 @@ body.mm-cm-help-open {
   color: #f0c040;
 }
 
+/* Filled favorite star in labels (filter toolbar, Help) — matches active row star */
+.mm-fav-star-mark {
+  color: #f0c040;
+  font-weight: 700;
+}
+
 .mm-filter-row__favorite-btn:focus-visible {
   outline: 2px solid #7aa8ff;
   outline-offset: 1px;
