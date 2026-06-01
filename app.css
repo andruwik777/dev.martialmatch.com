@@ -540,7 +540,17 @@ body {
 }
 
 .header.mm-cm-page-header + .main {
+  --mm-cm-stack-gap: 0.5rem;
   padding-top: var(--mm-cm-stack-gap);
+}
+
+/* Gap below header event card (same rhythm as tabs → filter); avoid doubling with .main padding */
+.header.mm-cm-page-header:has(.mm-cm-header-card-wrap:not(.is-hidden)) + .main {
+  padding-top: 0;
+}
+
+.mm-cm-header-card-wrap:not(.is-hidden) {
+  margin-bottom: var(--mm-cm-stack-gap);
 }
 
 /* Current matches — trzy zakładki (Events / Fights / Harmonogram) */
