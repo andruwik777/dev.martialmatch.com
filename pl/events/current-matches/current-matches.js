@@ -3957,7 +3957,7 @@
   }
 
   function filterMainBtnLabelSlugTab(tab, selectedOnEvent, totalUrlSlug) {
-    var kind = tab === CM_TAB_HARMONOGRAM ? "schedules" : "fights";
+    var kind = tab === CM_TAB_HARMONOGRAM ? "schedule" : "fights";
     if (!totalUrlSlug) return "Filter " + kind + " by participants";
     return (
       "Filtered " +
