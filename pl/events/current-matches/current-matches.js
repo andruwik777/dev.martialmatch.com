@@ -2430,15 +2430,11 @@
       }
     }
 
-    var slugChanged = Boolean(nextSlug && nextSlug !== prevSlug);
-    if (slugChanged) {
-      p.delete(URL_PARAM_SLUG_FILTER);
+    if (nextSlug && nextSlug !== prevSlug) {
       p.set("slug", nextSlug);
-      if (idsUnique.length) {
-        p.set(URL_PARAM_SLUG_FILTER, idsUnique.join(","));
-      }
     }
 
+    var slugChanged = Boolean(nextSlug && nextSlug !== prevSlug);
     commitSearchParamsAndRefreshFilterUi(p);
 
     if (!slugChanged || !nextSlug) {
@@ -2564,12 +2560,7 @@
 
   function replaceSlugInUrl(slugStr, tab) {
     var p = new URLSearchParams(window.location.search);
-    var prevParsed = eventSlugFromQuery(p);
-    var prevSlug = prevParsed ? prevParsed.slug : "";
     if (slugStr) {
-      if (prevSlug !== slugStr) {
-        p.delete(URL_PARAM_SLUG_FILTER);
-      }
       p.set("slug", slugStr);
     } else {
       p.delete("slug");
