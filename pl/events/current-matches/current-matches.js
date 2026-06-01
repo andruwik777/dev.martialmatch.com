@@ -4245,50 +4245,6 @@
     }
   }
 
-  /** @returns {Record<string, true>} */
-  function buildActiveEventPublicIdInEventMap() {
-    var inEvent = Object.create(null);
-    if (!startingListEntries || !startingListEntries.length) {
-      return inEvent;
-    }
-    for (var ci = 0; ci < startingListEntries.length; ci++) {
-      var pid = startingListEntries[ci].publicId;
-      if (pid) inEvent[pid] = true;
-    }
-    return inEvent;
-  }
-
-  /**
-   * Fights/Schedule: keep slug_filter IDs not on this event's starting list;
-   * set IDs on this event to the checked panel selection.
-   */
-  function mergeSlugFilterForActiveEventPanel(checkedIds) {
-    var inEvent = buildActiveEventPublicIdInEventMap();
-    if (!Object.keys(inEvent).length) {
-      setSlugFilterQueryInUrl(checkedIds);
-      return;
-    }
-    var urlSet = getSlugFilterIdSetFromUrl();
-    var seen = Object.create(null);
-    var merged = [];
-    if (urlSet) {
-      for (var k in urlSet) {
-        if (!inEvent[k] && !seen[k]) {
-          seen[k] = true;
-          merged.push(k);
-        }
-      }
-    }
-    for (var i = 0; i < checkedIds.length; i++) {
-      var id = checkedIds[i];
-      if (id && !seen[id]) {
-        seen[id] = true;
-        merged.push(id);
-      }
-    }
-    setSlugFilterQueryInUrl(merged);
-  }
-
   function applyFilterFromPanel() {
     var tab = getCmTabFromUrl();
     var ids = collectCheckedPublicIds();
@@ -4298,16 +4254,7 @@
       });
       return;
     }
-    if (
-      (tab === CM_TAB_FIGHTS || tab === CM_TAB_HARMONOGRAM) &&
-      evSlug &&
-      startingListEntries &&
-      startingListEntries.length
-    ) {
-      mergeSlugFilterForActiveEventPanel(ids);
-    } else {
-      setSlugFilterQueryInUrl(ids);
-    }
+    setSlugFilterQueryInUrl(ids);
     closeFilterPanelAndRefreshViews(tab);
   }
 
@@ -4323,7 +4270,20 @@
       startingListEntries &&
       startingListEntries.length
     ) {
-      mergeSlugFilterForActiveEventPanel([]);
+      var inEvent = Object.create(null);
+      for (var ci = 0; ci < startingListEntries.length; ci++) {
+        inEvent[startingListEntries[ci].publicId] = true;
+      }
+      var urlSet = getSlugFilterIdSetFromUrl();
+      if (urlSet) {
+        var remaining = [];
+        for (var k in urlSet) {
+          if (!inEvent[k]) remaining.push(k);
+        }
+        setSlugFilterQueryInUrl(remaining);
+      } else {
+        setSlugFilterQueryInUrl([]);
+      }
     } else if (tab === CM_TAB_EVENTS) {
       setSlugFilterQueryInUrl([]);
     } else {
