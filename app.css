@@ -538,7 +538,7 @@ body {
 .mm-cm-tabs {
   display: flex;
   gap: 0.35rem;
-  margin: 0 0 0.75rem;
+  margin: 0 0 0.5rem;
 }
 
 /* ~25% / 50% / 25% — środkowa zakładka Fights szersza */
@@ -1428,7 +1428,8 @@ body {
 
 /* Current matches — filtr uczestników (starting-lists) */
 .mm-cm-filter {
-  margin-bottom: 0.85rem;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
 }
 
 .mm-cm-events-toolbar {

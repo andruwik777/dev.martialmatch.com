@@ -59,6 +59,82 @@
   <main class="main">
     <div id="mm-cm-error" class="mm-alert mm-alert--error is-hidden" role="alert"></div>
     <div id="mm-cm-content">
+      <div
+        class="mm-cm-tabs"
+        role="tablist"
+        aria-label="Event view"
+      >
+        <button
+          type="button"
+          class="mm-cm-tab"
+          id="mm-cm-tab-events"
+          role="tab"
+          aria-selected="true"
+          aria-controls="mm-cm-panel-events"
+          tabindex="0"
+        >
+          Events
+        </button>
+        <button
+          type="button"
+          class="mm-cm-tab mm-cm-tab--fights mm-cm-tab--disabled"
+          id="mm-cm-tab-fights"
+          role="tab"
+          aria-selected="false"
+          aria-controls="mm-cm-panel-fights"
+          tabindex="-1"
+          disabled
+          aria-disabled="true"
+        >
+          <span id="mm-cm-tab-fights-label" class="mm-cm-tab__label">Fights</span>
+          <span
+            class="mm-cm-tab__refresh"
+            id="mm-cm-tab-fights-refresh"
+            hidden
+            aria-hidden="true"
+            ><svg
+              class="mm-cm-tab-refresh-ic"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              width="12"
+              height="12"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+              />
+            </svg>
+          </span>
+          <span
+            class="mm-cm-tab__wss"
+            id="mm-cm-tab-fights-wss"
+            hidden
+            aria-hidden="true"
+            role="presentation"
+            ><span
+              class="mm-cm-tab__wss-dot"
+              id="mm-cm-tab-fights-wss-dot"
+            ></span>
+          </span>
+        </button>
+        <button
+          type="button"
+          class="mm-cm-tab mm-cm-tab--disabled"
+          id="mm-cm-tab-harmonogram"
+          role="tab"
+          aria-selected="false"
+          aria-controls="mm-cm-panel-harmonogram"
+          tabindex="-1"
+          disabled
+          aria-disabled="true"
+        >
+          <span class="mm-cm-tab__label">Schedule</span>
+        </button>
+      </div>
       <div id="mm-cm-filter-root" class="mm-cm-filter is-hidden">
         <div
           id="mm-cm-events-toolbar"
@@ -269,82 +345,6 @@
             </button>
           </div>
         </div>
-      </div>
-      <div
-        class="mm-cm-tabs"
-        role="tablist"
-        aria-label="Event view"
-      >
-        <button
-          type="button"
-          class="mm-cm-tab"
-          id="mm-cm-tab-events"
-          role="tab"
-          aria-selected="true"
-          aria-controls="mm-cm-panel-events"
-          tabindex="0"
-        >
-          Events
-        </button>
-        <button
-          type="button"
-          class="mm-cm-tab mm-cm-tab--fights mm-cm-tab--disabled"
-          id="mm-cm-tab-fights"
-          role="tab"
-          aria-selected="false"
-          aria-controls="mm-cm-panel-fights"
-          tabindex="-1"
-          disabled
-          aria-disabled="true"
-        >
-          <span id="mm-cm-tab-fights-label" class="mm-cm-tab__label">Fights</span>
-          <span
-            class="mm-cm-tab__refresh"
-            id="mm-cm-tab-fights-refresh"
-            hidden
-            aria-hidden="true"
-            ><svg
-              class="mm-cm-tab-refresh-ic"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              width="12"
-              height="12"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-          </span>
-          <span
-            class="mm-cm-tab__wss"
-            id="mm-cm-tab-fights-wss"
-            hidden
-            aria-hidden="true"
-            role="presentation"
-            ><span
-              class="mm-cm-tab__wss-dot"
-              id="mm-cm-tab-fights-wss-dot"
-            ></span>
-          </span>
-        </button>
-        <button
-          type="button"
-          class="mm-cm-tab mm-cm-tab--disabled"
-          id="mm-cm-tab-harmonogram"
-          role="tab"
-          aria-selected="false"
-          aria-controls="mm-cm-panel-harmonogram"
-          tabindex="-1"
-          disabled
-          aria-disabled="true"
-        >
-          <span class="mm-cm-tab__label">Schedule</span>
-        </button>
       </div>
       <div
         id="mm-cm-panel-events"
