@@ -1627,6 +1627,7 @@ body {
   flex-wrap: nowrap;
   align-items: stretch;
   gap: 0.28rem;
+  width: 100%;
 }
 
 .mm-filter-toolbar-row__club {
@@ -1639,9 +1640,8 @@ body {
 }
 
 .mm-filter-only-favorites {
-  flex: 1 1 auto;
+  flex: 1 1 0;
   min-width: 0;
-  max-width: 42%;
   display: flex;
   align-items: center;
   gap: 0.28rem;
@@ -1684,8 +1684,8 @@ body {
 }
 
 .mm-filter-only-selected {
-  flex: 0 1 auto;
-  max-width: 42%;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   align-items: center;
   gap: 0.28rem;
@@ -1736,14 +1736,6 @@ body {
 
   .mm-filter-only-selected__text--short {
     display: inline;
-  }
-
-  .mm-filter-only-selected {
-    max-width: 38%;
-  }
-
-  .mm-filter-only-favorites {
-    max-width: 38%;
   }
 }
 
