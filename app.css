@@ -534,11 +534,16 @@ body {
   color: #edf2f7;
 }
 
+/* Current matches — shared vertical rhythm (tabs ↔ filter row reference gap) */
+#mm-cm-content {
+  --mm-cm-stack-gap: 0.5rem;
+}
+
 /* Current matches — trzy zakładki (Events / Fights / Harmonogram) */
 .mm-cm-tabs {
   display: flex;
   gap: 0.35rem;
-  margin: 0 0 0.5rem;
+  margin: 0 0 var(--mm-cm-stack-gap);
 }
 
 /* ~25% / 50% / 25% — środkowa zakładka Fights szersza */
@@ -846,7 +851,7 @@ body {
 }
 
 .mm-cm-header-card-wrap {
-  margin: 0 0 0.35rem;
+  margin: 0 0 var(--mm-cm-stack-gap, 0.5rem);
 }
 
 .mm-cm-header-card-root {
@@ -1018,7 +1023,7 @@ body {
 
 /* Current matches — lista walk */
 .mm-cm-toolbar {
-  margin: 0 0 0.75rem;
+  margin: 0 0 var(--mm-cm-stack-gap, 0.5rem);
   font-size: 0.8125rem;
 }
 
@@ -1429,11 +1434,25 @@ body {
 /* Current matches — filtr uczestników (starting-lists) */
 .mm-cm-filter {
   margin-top: 0;
-  margin-bottom: 0.75rem;
+  margin-bottom: var(--mm-cm-stack-gap);
 }
 
 .mm-cm-events-toolbar {
-  margin-bottom: 0.55rem;
+  margin-bottom: var(--mm-cm-stack-gap);
+}
+
+.mm-cm-filter.is-open:not(.is-hidden) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mm-cm-stack-gap);
+}
+
+.mm-cm-filter.is-open:not(.is-hidden) .mm-cm-events-toolbar {
+  margin-bottom: 0;
+}
+
+.mm-cm-filter.is-open:not(.is-hidden) .mm-filter-panel:not(.is-hidden) {
+  margin-top: 0;
 }
 
 .mm-cm-events-toolbar__actions {
@@ -1545,26 +1564,35 @@ body {
   padding-right: 0.75rem;
 }
 
-.mm-filter-panel {
-  margin-top: 0.5rem;
+.mm-filter-panel:not(.is-hidden) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mm-cm-stack-gap);
+  margin-top: var(--mm-cm-stack-gap);
+}
+
+.mm-filter-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mm-cm-stack-gap);
+  min-width: 0;
 }
 
 .mm-filter-panel .mm-filter-scroll {
-  margin-top: 0.45rem;
+  margin-top: 0;
 }
 
 .mm-filter-panel-status {
-  margin: 0 0 0.5rem;
+  margin: 0;
   font-size: 0.8125rem;
 }
 
 .mm-filter-panel-status:empty {
   display: none;
-  margin: 0;
 }
 
 .mm-filter-panel-hint {
-  margin: 0 0 0.5rem;
+  margin: 0;
   font-size: 0.8125rem;
   line-height: 1.45;
   color: #a0aec0;
@@ -1584,7 +1612,7 @@ body {
 }
 
 .mm-filter-search-wrap {
-  margin: 0 0 0.5rem;
+  margin: 0;
 }
 
 .mm-filter-search-input {
@@ -1620,7 +1648,7 @@ body {
 .mm-filter-club-jump-wrap {
   position: relative;
   z-index: 5;
-  margin: 0 0 0.5rem;
+  margin: 0;
 }
 
 .mm-filter-toolbar-row {
@@ -1955,12 +1983,13 @@ body {
     padding-bottom: 0;
     display: flex;
     flex-direction: column;
+    gap: var(--mm-cm-stack-gap);
     overflow: hidden;
     background: #12141a;
   }
 
   #mm-cm-filter-root.mm-cm-filter.is-open:not(.is-hidden) .mm-cm-events-toolbar {
-    margin-bottom: 0.4rem;
+    margin-bottom: 0;
     flex-shrink: 0;
   }
 
@@ -1971,9 +2000,10 @@ body {
   #mm-cm-filter-root.mm-cm-filter.is-open:not(.is-hidden) #mm-filter-panel:not(.is-hidden) {
     flex: 1 1 0;
     min-height: 0;
-    margin-top: 0.35rem;
+    margin-top: 0;
     display: flex;
     flex-direction: column;
+    gap: var(--mm-cm-stack-gap);
     overflow: hidden;
   }
 
@@ -1997,7 +2027,7 @@ body {
   #mm-cm-filter-root.mm-cm-filter.is-open:not(.is-hidden) .mm-filter-scroll {
     flex: 1 1 0;
     min-height: 0;
-    margin-top: 0.35rem;
+    margin-top: 0;
     max-height: none !important;
     border-bottom-left-radius: 10px;
     border-bottom-right-radius: 10px;
