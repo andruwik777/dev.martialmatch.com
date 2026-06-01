@@ -2672,11 +2672,66 @@
   }
 
   var homeNavBtn = document.getElementById("mm-cm-nav-home");
+  var helpNavBtn = document.getElementById("mm-cm-nav-help");
+  var helpRootEl = document.getElementById("mm-cm-help-root");
+  var helpCloseBtn = document.getElementById("mm-cm-help-close");
 
   function initHomeNav() {
     if (!homeNavBtn) return;
     homeNavBtn.addEventListener("click", function () {
       goHome();
+    });
+  }
+
+  function openHelpOverlay() {
+    if (!helpRootEl) return;
+    if (filterPanelOpen) {
+      closeFilterPanel();
+    }
+    helpRootEl.classList.remove("is-hidden");
+    helpRootEl.setAttribute("aria-hidden", "false");
+    document.body.classList.add("mm-cm-help-open");
+    if (helpNavBtn) {
+      helpNavBtn.setAttribute("aria-expanded", "true");
+    }
+    if (helpCloseBtn) {
+      helpCloseBtn.focus();
+    }
+  }
+
+  function closeHelpOverlay() {
+    if (!helpRootEl) return;
+    helpRootEl.classList.add("is-hidden");
+    helpRootEl.setAttribute("aria-hidden", "true");
+    document.body.classList.remove("mm-cm-help-open");
+    if (helpNavBtn) {
+      helpNavBtn.setAttribute("aria-expanded", "false");
+      helpNavBtn.focus();
+    }
+  }
+
+  function initHelpNav() {
+    if (!helpNavBtn || !helpRootEl) return;
+    helpNavBtn.setAttribute("aria-expanded", "false");
+    helpNavBtn.addEventListener("click", function () {
+      if (helpRootEl.classList.contains("is-hidden")) {
+        openHelpOverlay();
+      } else {
+        closeHelpOverlay();
+      }
+    });
+    if (helpCloseBtn) {
+      helpCloseBtn.addEventListener("click", closeHelpOverlay);
+    }
+    document.addEventListener("keydown", function (ev) {
+      if (
+        ev.key === "Escape" &&
+        helpRootEl &&
+        !helpRootEl.classList.contains("is-hidden")
+      ) {
+        ev.preventDefault();
+        closeHelpOverlay();
+      }
     });
   }
 
@@ -4680,6 +4735,7 @@
 
   initCmTabsFromUrl();
   initHomeNav();
+  initHelpNav();
   initShareNav();
   updateFilterRootVisibility();
   updateFilterMainButtonLabel();
