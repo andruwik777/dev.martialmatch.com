@@ -2571,14 +2571,11 @@
     eventsToolbarEl.classList.toggle("is-hidden", !onEvents);
     filterMainBtn.classList.toggle("is-hidden", onEvents);
 
-    var hasSlug = Boolean(evSlug);
-
     if (changeActiveEventBtn) {
       changeActiveEventBtn.classList.add("is-hidden");
     }
     if (filterMainBtnEvents) {
-      var showFilEv = onEvents && hasSlug;
-      filterMainBtnEvents.classList.toggle("is-hidden", !showFilEv);
+      filterMainBtnEvents.classList.toggle("is-hidden", !onEvents);
     }
   }
 
@@ -3948,22 +3945,26 @@
     return n;
   }
 
-  /** Unique athletes in merged filter list (all events), 0 if none loaded yet. */
-  function countAggregateFilterPoolSize() {
-    return buildAggregateFilterEntries().length;
+  function filterMainBtnLabelByParticipantCount(n) {
+    return n === 1 ? "1 participant" : n + " participants";
   }
 
-  function filterLabelEventsFightersCount(totalSelected) {
-    if (!totalSelected) return "All Participants";
-    var base =
-      totalSelected === 1
-        ? "1 Participant"
-        : totalSelected + " Participants";
-    var pool = countAggregateFilterPoolSize();
-    if (pool > 0) {
-      return base + " from " + pool;
-    }
-    return base;
+  function filterMainBtnLabelEvents(totalSelected) {
+    if (!totalSelected) return "Filter events by participants";
+    return (
+      "Filtered events by " + filterMainBtnLabelByParticipantCount(totalSelected)
+    );
+  }
+
+  function filterMainBtnLabelSlugTab(tab, selectedOnEvent, totalUrlSlug) {
+    var kind = tab === CM_TAB_HARMONOGRAM ? "schedules" : "fights";
+    if (!totalUrlSlug) return "Filter " + kind + " by participants";
+    return (
+      "Filtered " +
+      kind +
+      " by " +
+      filterMainBtnLabelByParticipantCount(selectedOnEvent)
+    );
   }
 
   /** Athletes on the active event starting list (denominator for filter button). */
@@ -3981,13 +3982,6 @@
       return startingListEntries.length;
     }
     return 0;
-  }
-
-  function filterLabelThisEventFighters(totalUrl, n) {
-    if (!totalUrl) return "This Event Participants · all";
-    var pool = countStartingListSizeActiveEvent();
-    var denom = pool > 0 ? pool : totalUrl;
-    return "This Event Participants · " + n + " / " + denom;
   }
 
   function updateFilterMainButtonLabel() {
@@ -4016,9 +4010,9 @@
       }
       if (lab) {
         if (btn === filterMainBtnEvents && tab === CM_TAB_EVENTS) {
-          lab.textContent = filterLabelEventsFightersCount(totalUrlEvents);
+          lab.textContent = filterMainBtnLabelEvents(totalUrlEvents);
         } else if (btn === filterMainBtn && tab !== CM_TAB_EVENTS) {
-          lab.textContent = filterLabelThisEventFighters(totalUrlSlug, n);
+          lab.textContent = filterMainBtnLabelSlugTab(tab, n, totalUrlSlug);
         }
       }
       if (tab === CM_TAB_EVENTS) {
