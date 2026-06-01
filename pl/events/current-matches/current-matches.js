@@ -573,7 +573,7 @@
    * includes all mats from the fights payload; otherwise only mats for rows that
    * pass the same filter as renderFights (fightMatchesFilter).
    * @param {object|null|undefined} data
-   * @param {Record<string, true>|null|undefined} idSet from getSlugFilterIdSetFromUrl
+   * @param {Record<string, true>|null|undefined} idSet effective filter for active event
    */
   function buildWssChannelListForFightsData(data, idSet) {
     if (!data || !data.result || !Array.isArray(data.result)) return [];
@@ -708,7 +708,7 @@
     }
     var want = buildWssChannelListForFightsData(
       lastFightsData,
-      getSlugFilterIdSetFromUrl()
+      getSlugFilterIdSetEffectiveForActiveEvent()
     );
     var wmap = Object.create(null);
     for (var a = 0; a < want.length; a++) {
@@ -1306,7 +1306,7 @@
     }
 
     var index = buildCategoryScheduleIndex(lastSchedulesPayload);
-    var idSet = getSlugFilterIdSetFromUrl();
+    var idSet = getSlugFilterIdSetEffectiveForActiveEvent();
     var filtered = startingListEntries.filter(function (e) {
       if (e.categoryParameterId == null) return false;
       if (idSet && !idSet[e.publicId]) return false;
@@ -2634,9 +2634,8 @@
     }
     var s = fightsTabStats.shown;
     var t = fightsTabStats.total;
-    var slugFilter = getSlugFilterIdSetFromUrl();
-    var filtered =
-      Boolean(slugFilter && Object.keys(slugFilter).length);
+    var slugFilter = getSlugFilterIdSetEffectiveForActiveEvent();
+    var filtered = Boolean(slugFilter);
     var body = filtered ? "Fights " + s + "/" + t : "Fights " + t;
     if (tabFightsLabelEl) tabFightsLabelEl.textContent = body;
     else tabFightsBtn.textContent = body;
@@ -4005,6 +4004,27 @@
   }
 
   /**
+   * slug_filter ids on the active event starting list, or null when none apply
+   * (Fights/Schedule treat null as no filter for this event).
+   * @returns {Record<string, true>|null}
+   */
+  function getSlugFilterIdSetEffectiveForActiveEvent() {
+    var raw = getSlugFilterIdSetFromUrl();
+    if (!raw) return null;
+    var inEvent = buildActiveEventPublicIdLookup();
+    if (!inEvent) return null;
+    var out = Object.create(null);
+    var n = 0;
+    for (var k in raw) {
+      if (inEvent[k]) {
+        out[k] = true;
+        n++;
+      }
+    }
+    return n ? out : null;
+  }
+
+  /**
    * IDs in slug_filter that appear in the current tab's participant pool
    * (aggregate list on Events, active event starting list on Fights/Schedule).
    */
@@ -4032,13 +4052,8 @@
       }
       return nf;
     }
-    var inEvent = buildActiveEventPublicIdLookup();
-    if (!inEvent) return 0;
-    var n = 0;
-    for (var pid in idSet) {
-      if (inEvent[pid]) n++;
-    }
-    return n;
+    var effective = getSlugFilterIdSetEffectiveForActiveEvent();
+    return effective ? Object.keys(effective).length : 0;
   }
 
   /** Unique athletes in merged filter list (all events), 0 if none loaded yet. */
@@ -4076,10 +4091,10 @@
     return 0;
   }
 
-  function filterLabelThisEventFighters(totalUrl, n) {
-    if (!totalUrl) return "This Event Participants · all";
+  function filterLabelThisEventFighters(n) {
+    if (!n) return "This Event Participants · all";
     var pool = countStartingListSizeActiveEvent();
-    var denom = pool > 0 ? pool : totalUrl;
+    var denom = pool > 0 ? pool : n;
     return "This Event Participants · " + n + " / " + denom;
   }
 
@@ -4089,7 +4104,6 @@
 
     var n = countFilterIdsForMainButton();
     var tab = getCmTabFromUrl();
-    var totalUrlSlug = countSlugFilterIdsInUrl();
     var poolActive = countStartingListSizeActiveEvent();
 
     for (var ti = 0; ti < triggers.length; ti++) {
@@ -4110,7 +4124,7 @@
         if (btn === filterMainBtnEvents && tab === CM_TAB_EVENTS) {
           lab.textContent = filterLabelEventsFightersCount(n);
         } else if (btn === filterMainBtn && tab !== CM_TAB_EVENTS) {
-          lab.textContent = filterLabelThisEventFighters(totalUrlSlug, n);
+          lab.textContent = filterLabelThisEventFighters(n);
         }
       }
       if (tab === CM_TAB_EVENTS) {
@@ -4142,12 +4156,8 @@
                 " athletes on the starting list."
               : "Open filter — for this event, " +
                 n +
-                " participant(s) from URL match the starting list."
-            : totalUrlSlug > 0
-              ? "Open filter — URL has " +
-                totalUrlSlug +
-                " participant(s), none on this event's list."
-              : "Open filter — none in URL; all participants shown."
+                " participant(s) match the starting list."
+            : "Open filter — all participants shown for this event."
         );
         btn.title =
           n > 0
@@ -4159,12 +4169,8 @@
                 " on the starting list. Click to edit."
               : "For this event, " +
                 n +
-                " participant(s) from URL match the starting list. Click to edit."
-            : totalUrlSlug > 0
-              ? "URL has " +
-                totalUrlSlug +
-                " participant(s), but none are on this event's list."
-              : "No filter in URL — all visible. Click to pick participants.";
+                " participant(s) on the starting list. Click to edit."
+            : "All participants shown for this event. Click to pick a filter.";
       }
     }
   }
@@ -4508,7 +4514,7 @@
     lastFightsData = data;
     listEl.innerHTML = "";
 
-    var idSet = getSlugFilterIdSetFromUrl();
+    var idSet = getSlugFilterIdSetEffectiveForActiveEvent();
     var queue = (data && data.fightQueueStatuses) || {};
     var allRows = (
       data && data.result && Array.isArray(data.result) ? data.result : []
