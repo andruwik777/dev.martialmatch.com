@@ -539,6 +539,10 @@ body {
   --mm-cm-stack-gap: 0.5rem;
 }
 
+.header.mm-cm-page-header + .main {
+  padding-top: var(--mm-cm-stack-gap);
+}
+
 /* Current matches — trzy zakładki (Events / Fights / Harmonogram) */
 .mm-cm-tabs {
   display: flex;
@@ -746,14 +750,14 @@ body {
 
 /* Current-matches: same column as .main (36rem), not full viewport */
 .header.mm-cm-page-header {
+  --mm-cm-stack-gap: 0.5rem;
   max-width: 36rem;
   margin-left: auto;
   margin-right: auto;
   width: 100%;
   box-sizing: border-box;
   border-bottom: none;
-  /* Match gap below nav (~0.25rem nav + ~0.1rem context) */
-  padding: 0.35rem 1rem 0.2rem;
+  padding: 0.35rem 1rem 0;
 }
 
 .header.mm-cm-page-header .mm-cm-header-nav {
@@ -851,7 +855,7 @@ body {
 }
 
 .mm-cm-header-card-wrap {
-  margin: 0 0 var(--mm-cm-stack-gap, 0.5rem);
+  margin: 0;
 }
 
 .mm-cm-header-card-root {
