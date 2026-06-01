@@ -65,6 +65,7 @@
   var MSG_FIGHTS_NOT_READY =
     "Fight list isn't ready yet — organizers may still be preparing it.";
 
+  var URL_PARAM_EVENTS_FILTER = "events_filter";
   var URL_PARAM_SLUG_FILTER = "slug_filter";
   var FAVORITES_LS_KEY = "mm_cm_favorites_v1";
 
@@ -1722,7 +1723,7 @@
       articles[c].classList.remove("mm-event-row--filtered-out");
     }
 
-    var idSet = getSlugFilterIdSetFromUrl();
+    var idSet = getEventsFilterIdSetFromUrl();
     if (!idSet || !Object.keys(idSet).length) {
       updateEventsTabLabel();
       return;
@@ -1756,9 +1757,9 @@
     updateEventsTabLabel();
   }
 
-  /** Events tab: non-empty slug_filter in URL (event rows may be narrowed). */
+  /** Events tab: non-empty events_filter in URL (list rows may be narrowed). */
   function eventsUrlFilterActive() {
-    var idSet = getSlugFilterIdSetFromUrl();
+    var idSet = getEventsFilterIdSetFromUrl();
     return Boolean(idSet && Object.keys(idSet).length);
   }
 
@@ -2361,125 +2362,12 @@
     return Object.keys(map).length ? map : null;
   }
 
+  function getEventsFilterIdSetFromUrl() {
+    return getPublicIdSetFromUrlParam(URL_PARAM_EVENTS_FILTER);
+  }
+
   function getSlugFilterIdSetFromUrl() {
     return getPublicIdSetFromUrlParam(URL_PARAM_SLUG_FILTER);
-  }
-
-  function countSlugFilterIdsInUrl() {
-    var idSet = getSlugFilterIdSetFromUrl();
-    if (!idSet) return 0;
-    return Object.keys(idSet).length;
-  }
-
-  function eventNumericIdMatchesFilterIdSet(numericId, idSet) {
-    if (!idSet || numericId == null) return false;
-    var map = eventParticipantIdMap[numericId];
-    if (!map) return false;
-    for (var pid in idSet) {
-      if (map[pid]) return true;
-    }
-    return false;
-  }
-
-  /** First event slug in list order with any filter publicId on its starting list. */
-  function findFirstEventSlugMatchingFilterIdSet(idSet) {
-    if (!idSet) return "";
-    for (var e = 0; e < parsedEventsList.length; e++) {
-      var ev = parsedEventsList[e];
-      if (eventNumericIdMatchesFilterIdSet(ev.numericId, idSet)) {
-        return ev.slug;
-      }
-    }
-    return "";
-  }
-
-  /**
-   * Events tab Apply: one replaceState for slug_filter; change slug only when the
-   * current event is not among events that match the new filter.
-   * @returns {Promise<void>}
-   */
-  function applySlugFilterFromEventsPanel(idsUnique) {
-    var p = new URLSearchParams(window.location.search);
-    var prevParsed = eventSlugFromQuery(p);
-    var prevSlug = prevParsed ? prevParsed.slug : "";
-    var idSet = null;
-    if (idsUnique.length) {
-      idSet = Object.create(null);
-      for (var ii = 0; ii < idsUnique.length; ii++) {
-        var rid = String(idsUnique[ii] || "").trim();
-        if (rid) idSet[rid] = true;
-      }
-      if (!Object.keys(idSet).length) {
-        idSet = null;
-      }
-    }
-
-    if (!idsUnique.length) {
-      p.delete(URL_PARAM_SLUG_FILTER);
-    } else {
-      p.set(URL_PARAM_SLUG_FILTER, idsUnique.join(","));
-    }
-
-    var nextSlug = prevSlug;
-    if (idSet) {
-      var currentStillVisible =
-        prevParsed &&
-        eventNumericIdMatchesFilterIdSet(prevParsed.numericId, idSet);
-      if (!currentStillVisible) {
-        nextSlug = findFirstEventSlugMatchingFilterIdSet(idSet) || prevSlug;
-      }
-    }
-
-    var slugChanged = Boolean(nextSlug && nextSlug !== prevSlug);
-    if (slugChanged) {
-      p.delete(URL_PARAM_SLUG_FILTER);
-      p.set("slug", nextSlug);
-      if (idsUnique.length) {
-        p.set(URL_PARAM_SLUG_FILTER, idsUnique.join(","));
-      }
-    }
-
-    commitSearchParamsAndRefreshFilterUi(p);
-
-    if (!slugChanged || !nextSlug) {
-      return Promise.resolve();
-    }
-
-    var slugObj = cfg.parseEventSlug(nextSlug);
-    if (!slugObj) {
-      return Promise.resolve();
-    }
-
-    notifyUrlChanged();
-    renderFights(null);
-    applyCmTabDom(getCmTabFromUrl());
-    highlightSelectedEventRow(nextSlug);
-    if (placeholderEl) {
-      placeholderEl.classList.remove("is-hidden");
-      placeholderEl.textContent = "Loading…";
-    }
-    clearError();
-    return ensureEventLoaded(slugObj)
-      .then(function () {
-        syncHeaderEventLine();
-        if (placeholderEl) placeholderEl.classList.add("is-hidden");
-        clearError();
-        if (lastFightsData) {
-          renderFights(lastFightsData);
-        } else {
-          renderFights(null);
-        }
-        refreshHarmonogram();
-        prefetchStartingListEarly();
-        updatePollingForTab();
-        updateFilterMainButtonLabel();
-        refreshEventsListVisibility();
-      })
-      .catch(function (err) {
-        showError(
-          "Failed to load event: " + (err.message || String(err))
-        );
-      });
   }
 
   function fightMatchesFilter(row, idSet) {
@@ -2500,6 +2388,16 @@
     refreshSlugFromLocation();
     refreshEventsListVisibility();
     updateFilterMainButtonLabel();
+  }
+
+  function setEventsFilterQueryInUrl(idsUnique) {
+    var p = new URLSearchParams(window.location.search);
+    if (!idsUnique.length) {
+      p.delete(URL_PARAM_EVENTS_FILTER);
+    } else {
+      p.set(URL_PARAM_EVENTS_FILTER, idsUnique.join(","));
+    }
+    commitSearchParamsAndRefreshFilterUi(p);
   }
 
   function setSlugFilterQueryInUrl(idsUnique) {
@@ -2738,6 +2636,7 @@
     var p = new URLSearchParams(window.location.search);
     p.delete("slug");
     p.delete(URL_PARAM_SLUG_FILTER);
+    p.delete(URL_PARAM_EVENTS_FILTER);
     p.set("tab", "events");
     replaceLocationQuery(p);
 
@@ -3971,7 +3870,10 @@
 
   function syncFilterCheckboxesFromUrl() {
     if (!filterListRootEl) return;
-    var idSet = getSlugFilterIdSetFromUrl();
+    var idSet =
+      getCmTabFromUrl() === CM_TAB_EVENTS
+        ? getEventsFilterIdSetFromUrl()
+        : getSlugFilterIdSetFromUrl();
     var boxes = filterListRootEl.querySelectorAll(
       'input[type="checkbox"][data-mm-filter-member]'
     );
@@ -3981,6 +3883,18 @@
     }
     refreshAllClubHeaderCheckboxes();
     applyFilterPanelListVisibility();
+  }
+
+  function countEventsFilterIdsInUrl() {
+    var idSet = getEventsFilterIdSetFromUrl();
+    if (!idSet) return 0;
+    return Object.keys(idSet).length;
+  }
+
+  function countSlugFilterIdsInUrl() {
+    var idSet = getSlugFilterIdSetFromUrl();
+    if (!idSet) return 0;
+    return Object.keys(idSet).length;
   }
 
   /**
@@ -4014,38 +3928,22 @@
   }
 
   /**
-   * IDs in slug_filter that appear in the current tab's participant pool
-   * (aggregate list on Events, active event starting list on Fights/Schedule).
+   * On Events tab: all IDs in URL. On Fights/Schedule: IDs in URL that
+   * appear on the current event's starting list.
    */
   function countFilterIdsForMainButton() {
-    var idSet = getSlugFilterIdSetFromUrl();
-    if (!idSet) return 0;
     var tab = getCmTabFromUrl();
     if (tab === CM_TAB_EVENTS) {
-      var entries = buildAggregateFilterEntries();
-      if (entries.length) {
-        var ne = 0;
-        for (var i = 0; i < entries.length; i++) {
-          if (idSet[entries[i].publicId]) ne++;
-        }
-        return ne;
-      }
-      var nf = 0;
-      for (var k in idSet) {
-        for (var nid in eventParticipantIdMap) {
-          if (eventParticipantIdMap[nid][k]) {
-            nf++;
-            break;
-          }
-        }
-      }
-      return nf;
+      var es = getEventsFilterIdSetFromUrl();
+      return es ? Object.keys(es).length : 0;
     }
+    var idSet = getSlugFilterIdSetFromUrl();
+    if (!idSet) return 0;
     var inEvent = buildActiveEventPublicIdLookup();
     if (!inEvent) return 0;
     var n = 0;
-    for (var pid in idSet) {
-      if (inEvent[pid]) n++;
+    for (var k in idSet) {
+      if (inEvent[k]) n++;
     }
     return n;
   }
@@ -4098,6 +3996,7 @@
 
     var n = countFilterIdsForMainButton();
     var tab = getCmTabFromUrl();
+    var totalUrlEvents = countEventsFilterIdsInUrl();
     var totalUrlSlug = countSlugFilterIdsInUrl();
     var poolActive = countStartingListSizeActiveEvent();
 
@@ -4117,7 +4016,7 @@
       }
       if (lab) {
         if (btn === filterMainBtnEvents && tab === CM_TAB_EVENTS) {
-          lab.textContent = filterLabelEventsFightersCount(n);
+          lab.textContent = filterLabelEventsFightersCount(totalUrlEvents);
         } else if (btn === filterMainBtn && tab !== CM_TAB_EVENTS) {
           lab.textContent = filterLabelThisEventFighters(totalUrlSlug, n);
         }
@@ -4258,12 +4157,10 @@
     var tab = getCmTabFromUrl();
     var ids = collectCheckedPublicIds();
     if (tab === CM_TAB_EVENTS) {
-      applySlugFilterFromEventsPanel(ids).then(function () {
-        closeFilterPanelAndRefreshViews(tab);
-      });
-      return;
+      setEventsFilterQueryInUrl(ids);
+    } else {
+      setSlugFilterQueryInUrl(ids);
     }
-    setSlugFilterQueryInUrl(ids);
     closeFilterPanelAndRefreshViews(tab);
   }
 
@@ -4294,7 +4191,7 @@
         setSlugFilterQueryInUrl([]);
       }
     } else if (tab === CM_TAB_EVENTS) {
-      setSlugFilterQueryInUrl([]);
+      setEventsFilterQueryInUrl([]);
     } else {
       setSlugFilterQueryInUrl([]);
     }
@@ -4772,12 +4669,12 @@
   }
 
   /**
-   * When URL has slug_filter, load every event's starting list so
+   * When URL has events_filter, load every event's starting list so
    * eventParticipantIdMap / aggregate pool are correct on any tab (shared
    * deep links with tab=fights or tab=harmonogram).
    */
   function maybeAggregateForEventsTab() {
-    if (!getSlugFilterIdSetFromUrl()) {
+    if (!getEventsFilterIdSetFromUrl()) {
       return Promise.resolve();
     }
     return ensureAggregateParticipantMaps()
