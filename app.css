@@ -1658,12 +1658,6 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-.mm-filter-only-favorites.is-active {
-  color: #f0c040;
-  border-color: #8a7020;
-  background: #2e2a1e;
-}
-
 .mm-filter-only-favorites input {
   flex-shrink: 0;
   width: 1rem;

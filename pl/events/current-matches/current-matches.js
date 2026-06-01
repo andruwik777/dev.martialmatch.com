@@ -106,9 +106,6 @@
   );
   var filterOnlySelectedCb = document.getElementById("mm-filter-only-selected-cb");
   var filterOnlyFavoritesCb = document.getElementById("mm-filter-only-favorites-cb");
-  var filterOnlyFavoritesLabelEl = document.getElementById(
-    "mm-filter-only-favorites-label"
-  );
   var filterOnlyEmptyHintEl = document.getElementById("mm-filter-only-empty-hint");
   var filterSearchInputEl = document.getElementById("mm-filter-search-input");
 
@@ -2391,7 +2388,6 @@
     refreshSlugFromLocation();
     refreshEventsListVisibility();
     updateFilterMainButtonLabel();
-    updateFilterFavoritesOnlyToolbarUi();
   }
 
   function setEventsFilterQueryInUrl(idsUnique) {
@@ -2748,7 +2744,6 @@
     updateFilterRootVisibility();
     syncHeaderEventLine();
     updateEventsToolbarUi();
-    updateFilterFavoritesOnlyToolbarUi();
   }
 
   function applyCachedEventToView(nid) {
@@ -3621,111 +3616,6 @@
     return Object.keys(idSet).length;
   }
 
-  function filterIdSetsEqual(a, b) {
-    var na = filterIdSetKeyCount(a);
-    var nb = filterIdSetKeyCount(b);
-    if (na !== nb) return false;
-    if (!na) return true;
-    for (var k in a) {
-      if (!b[k]) return false;
-    }
-    return true;
-  }
-
-  /** Public IDs currently listed in the open filter panel. */
-  function getFilterListMemberPublicIds() {
-    var out = Object.create(null);
-    if (!filterListRootEl) return out;
-    var boxes = filterListRootEl.querySelectorAll(
-      'input[type="checkbox"][data-mm-filter-member]'
-    );
-    for (var i = 0; i < boxes.length; i++) {
-      var v = boxes[i].value;
-      if (v) out[v] = true;
-    }
-    return out;
-  }
-
-  /** Entries for the current filter list context (Events tab or active event). */
-  function getFilterListContextEntries() {
-    if (getCmTabFromUrl() === CM_TAB_EVENTS) {
-      return buildAggregateFilterEntries();
-    }
-    if (Array.isArray(startingListEntries) && startingListEntries.length) {
-      return startingListEntries;
-    }
-    if (eventNumericId && eventCache[eventNumericId]) {
-      var c = eventCache[eventNumericId];
-      if (c && c.startingListsPublic != null) {
-        return flattenStartingListFromPublicBody(c.startingListsPublic);
-      }
-    }
-    return [];
-  }
-
-  /** Favorite athletes on the current filter list — all their publicIds. */
-  function getApplicableFavoritesPresetIdSet() {
-    var favKeys = loadFavoriteAthleteKeySet();
-    var entries = getFilterListContextEntries();
-    var out = Object.create(null);
-    for (var i = 0; i < entries.length; i++) {
-      var ent = entries[i];
-      var key = athleteKeyFromEntry(ent);
-      if (key && favKeys[key]) {
-        out[ent.publicId] = true;
-      }
-    }
-    return out;
-  }
-
-  /** @returns {Record<string, true>} */
-  function panelCheckboxIdSetFromDom() {
-    var ids = collectCheckedPublicIds();
-    var out = Object.create(null);
-    for (var i = 0; i < ids.length; i++) {
-      out[ids[i]] = true;
-    }
-    return out;
-  }
-
-  function getCommittedUrlFilterIdSet() {
-    if (getCmTabFromUrl() === CM_TAB_EVENTS) {
-      return getEventsFilterIdSetFromUrl() || Object.create(null);
-    }
-    return getSlugFilterIdSetFromUrl() || Object.create(null);
-  }
-
-  /** URL filter IDs effective on the current tab context. */
-  function getEffectiveCommittedFilterIdSet() {
-    var raw = getCommittedUrlFilterIdSet();
-    if (getCmTabFromUrl() === CM_TAB_EVENTS) {
-      return raw;
-    }
-    var inList = getFilterListMemberPublicIds();
-    if (!filterIdSetKeyCount(inList)) {
-      inList = buildActiveEventPublicIdLookup() || Object.create(null);
-    }
-    var out = Object.create(null);
-    for (var k in raw) {
-      if (inList[k]) out[k] = true;
-    }
-    return out;
-  }
-
-  function panelCheckboxesMatchFavoritesPreset() {
-    return filterIdSetsEqual(
-      panelCheckboxIdSetFromDom(),
-      getApplicableFavoritesPresetIdSet()
-    );
-  }
-
-  function committedFilterMatchesFavoritesPreset() {
-    return filterIdSetsEqual(
-      getEffectiveCommittedFilterIdSet(),
-      getApplicableFavoritesPresetIdSet()
-    );
-  }
-
   function syncFilterFavoriteStarButtonUi(btn, isFavorite) {
     if (!btn) return;
     btn.classList.toggle("is-active", isFavorite);
@@ -3768,18 +3658,6 @@
     }
   }
 
-  function updateFilterFavoritesOnlyToolbarUi() {
-    if (!filterOnlyFavoritesLabelEl) return;
-    var preset = getApplicableFavoritesPresetIdSet();
-    var presetN = filterIdSetKeyCount(preset);
-    var filled =
-      presetN > 0 &&
-      (filterPanelOpen
-        ? panelCheckboxesMatchFavoritesPreset()
-        : committedFilterMatchesFavoritesPreset());
-    filterOnlyFavoritesLabelEl.classList.toggle("is-active", filled);
-  }
-
   function onFilterListCheckboxChange(ev) {
     var t = ev.target;
     if (!t || t.type !== "checkbox" || !filterListRootEl) return;
@@ -3795,14 +3673,12 @@
       }
       setClubHeaderCheckboxAria(t);
       applyFilterPanelListVisibility();
-      updateFilterFavoritesOnlyToolbarUi();
       return;
     }
 
     if (t.hasAttribute("data-mm-filter-member")) {
       updateClubHeaderCheckboxFromMembers(section);
       applyFilterPanelListVisibility();
-      updateFilterFavoritesOnlyToolbarUi();
     }
   }
 
@@ -3817,7 +3693,6 @@
     var nowFav = toggleFavoriteAthleteKey(athleteKey);
     syncAllFavoriteStarsForAthleteKey(athleteKey, nowFav);
     applyFilterPanelListVisibility();
-    updateFilterFavoritesOnlyToolbarUi();
   }
 
   function onFilterOnlyFavoritesChange() {
@@ -3991,7 +3866,6 @@
       filterSearchInputEl.value = "";
     }
     applyFilterPanelListVisibility();
-    updateFilterFavoritesOnlyToolbarUi();
   }
 
   function syncFilterCheckboxesFromUrl() {
@@ -4009,7 +3883,6 @@
     }
     refreshAllClubHeaderCheckboxes();
     applyFilterPanelListVisibility();
-    updateFilterFavoritesOnlyToolbarUi();
   }
 
   function countEventsFilterIdsInUrl() {
@@ -4226,7 +4099,6 @@
     }
     setFilterMobileBarVisible(true);
     updateFilterMainButtonLabel();
-    updateFilterFavoritesOnlyToolbarUi();
   }
 
   function closeFilterPanel() {
@@ -4243,7 +4115,6 @@
     }
     if (filterPanelStatusEl) filterPanelStatusEl.textContent = "";
     updateFilterMainButtonLabel();
-    updateFilterFavoritesOnlyToolbarUi();
   }
 
   function collectCheckedPublicIds() {
@@ -4818,7 +4689,6 @@
   initShareNav();
   updateFilterRootVisibility();
   updateFilterMainButtonLabel();
-  updateFilterFavoritesOnlyToolbarUi();
   syncHeaderEventLine();
 
   loadEventsIndex().then(function () {
