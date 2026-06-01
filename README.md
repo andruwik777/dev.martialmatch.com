@@ -1,6 +1,6 @@
 # MartialMatch viewer
 
-A lightweight web front end for [martialmatch.com](https://martialmatch.com) data, focused on **filtering by multiple athletes** and **shareable links**. This helps the coach stay focused and keep track of the athletes he is interested in during a specific event, or simply lets you see which competitions your friends have registered for. Have fun! 🤼🥋🥊
+A lightweight web front end for [martialmatch.com](https://martialmatch.com) data, focused on **filtering by multiple athletes**, **shareable links**, and **favorites** for people you follow across events. This helps a coach stay focused during a competition, lets parents open the same filtered view from a link, and makes it easier to see which events your athletes are registered for. Have fun! 🤼🥋🥊
 
 **Live site (Stable):** [andruwik777.github.io/martialmatch.com](https://andruwik777.github.io/martialmatch.com)
 
@@ -18,11 +18,21 @@ This project is **not affiliated with** MartialMatch. Functionality depends on M
 
 The official MartialMatch site does not provide functionality to filter **live fights** and **schedule** by a **set of people at once**. For a **coach at a competition** with a group of kids (or anyone following several athletes), that is awkward: you keep searching manually for who fights when.
 
-This app lets you **pick athletes in a filter** and see only the **fights** and **harmonogram** that matter for **one selected competition** (the active event in the URL via `slug`).
+The main view is **[Current matches](pl/events/current-matches/)** with three tabs:
 
-Separately, with **“all competitions”** mode enabled in the UI, you can scan **every competition in the list** and see **which events those athletes are registered for**. That is a **different workflow** from the per-competition filter: the two modes **do not mix** on screen, but they share the same idea—**stay on top of your people**.
+| Tab | What you see | Filter in URL |
+|-----|----------------|---------------|
+| **Events** | All upcoming events; rows narrow to events where selected athletes are registered | `events_filter` |
+| **Fights** | Live / polled fight list for the **active event** (`slug` in URL) | `slug_filter` |
+| **Schedule** | Category blocks and athletes on the harmonogram for that same event | `slug_filter` |
 
-Filters are stored in the **URL**, so you can **share a link** with friends or parents and they open the **same filtered view** without redoing the setup.
+On **Events**, pick athletes and apply — the list shows **which competitions they entered**. Switch to **Fights** or **Schedule** for the active event to see **only their fights or category rows**. The two filter params are **separate** (shared deep links can carry both; each tab reads its own).
+
+**Favorites** (☆ in the filter list, stored in **localStorage**, not the URL) help you quickly narrow the picker to people you track often — useful when the starting list is long.
+
+Filters are stored in the **URL** (`events_filter` / `slug_filter`), so you can **share a link** with friends or parents and they open the **same filtered view** without redoing the setup.
+
+**PWA:** the app can be installed for a more fullscreen, phone-friendly layout (minimal service worker; see `pwa.js`).
 
 ## Feedback & feature requests
 
@@ -79,11 +89,19 @@ The browser talks only to **your** Worker and **your** `wss://` host; both compo
 
 ## For developers
 
-Use "mode=test" in query URL parameters to simulate data with active competitions. 
+Use **`mode=test`** in the page URL to point HTTP requests at the **fixture Worker** (curated snapshots, no live MartialMatch).
 
-Proxy server is implemented as Cloudflare Workers: **prod** source is `server/prod-martialmatch`, **dev** is `server/dev-martialmatch`, **dev-test** (fixtures) is `server/dev-test-martialmatch`.
+Proxy servers live under **`server/*-martialmatch-v1/`** as Cloudflare Workers:
 
-**Caching:** The app relies on **server-side** caching (Cloudflare edge / Worker cache for stable HTML and schedule JSON) and **client-side** caching (browser HTTP cache via response headers) so repeat visits do not hammer the original site. Live or frequently changing data (e.g. fights) is not cached the same way.
+| Mode | Worker source | Upstream |
+|------|----------------|----------|
+| **prod** (default) | `server/prod-martialmatch-v1/` | Live `martialmatch.com` |
+| **dev** (same as prod upstream in this repo’s `config.js`) | `server/dev-martialmatch-v1/` | Live site + optional edge/browser cache |
+| **test** (`mode=test`) | `server/dev-test-martialmatch-v1/` | Fixtures from GitHub raw (`data/`) — **no** Worker cache |
+
+WebSocket proxies are sibling Node services: `server/dev-martialmatch-v1/wss-proxy.js`, `server/dev-test-martialmatch-v1/wss-proxy.js`, `server/prod-martialmatch-v1/wss-proxy.js` (shared core in `server/_shared/wss-proxy-core.js`).
+
+**Caching:** **Prod/dev** Workers can cache stable routes (events index HTML, starting lists, schedules) at the edge and optionally in the browser (`Cache-Control`, `X-Cache: HIT/MISS`). **Fights** stay **`no-store`**. The **test** Worker always **re-fetches** fixtures from raw GitHub (passthrough) — useful to exercise slow aggregate loads and loading states. Live or frequently changing data is not cached the same way on prod/dev.
 
 ### Dev vs prod styling (two repos)
 
@@ -101,36 +119,42 @@ After `app.css`, `theme-loader.js` sends a `HEAD` request for **`prod.css`** at 
 
 ### Test worker fixtures
 
-The test Cloudflare Worker serves files from `server/test-martialmatch/data/` via `https://raw.githubusercontent.com/andruwik777/dev.martialmatch.com/master/server/test-martialmatch/data/...` (use `main` instead of `master` in `worker.js` if that is your default branch).
+The test Cloudflare Worker serves files from **`server/dev-test-martialmatch-v1/data/`** via raw GitHub URLs configured in **`server/dev-test-martialmatch-v1/worker.js`** (`REPO_RAW_BASE`; use `main` instead of `master` if that is your default branch).
 
-**Regenerate everything** (from the repo root):
+**Regenerate HTML fixture slices** (from the repo root):
 
 ```bash
-python server/test-martialmatch/build_test_data.py
+python server/dev-test-martialmatch-v1/build_test_data.py
 ```
 
-**What the script does**
+**Refresh API-shaped starting lists** after HTML snapshots change:
+
+```bash
+python server/dev-test-martialmatch-v1/convert_starting_lists_html_to_json.py
+```
+
+**What `build_test_data.py` does**
 
 | Input | Output under `data/` |
 |--------|-------------------------|
 | `research/html.starting.list` | Per-event `starting-lists.html` (full / first ⅔ / last ⅔ / empty rows) |
 | `research/json.harmonogram`, `research/json.przebieg.walk` | `schedules.json` / `fights.json` for the “full data” event and variants |
-| Slice of `research/html.pl.events` | `events.html` (list of four test events only) |
+| Slice of `research/html.pl.events` | `data/pl/events.html` (event index for test) |
 
 **What to edit when things break**
 
-1. **`server/test-martialmatch/build_test_data.py`**
-   - `EVENTS_HTML_FIRST_LINE` / `EVENTS_HTML_LAST_LINE` — 1-based line numbers in `research/html.pl.events` for the block that contains exactly the event cards you want in `events.html`. If MartialMatch changes the HTML, re-open that file in an editor, find the first `<div class="columns is-centered is-gapless">` of your first card and the closing `</div>` after the last card, note line numbers, and update both constants.
-   - `SLUGS` — folder names under `data/` and the slugs must stay in sync with **`server/test-martialmatch/worker.js`** (`NUMERIC_TO_SLUG` and `ALLOWED_SLUGS`).
+1. **`server/dev-test-martialmatch-v1/build_test_data.py`**
+   - `EVENTS_HTML_FIRST_LINE` / `EVENTS_HTML_LAST_LINE` — 1-based line numbers in `research/html.pl.events` for the block that contains the event cards you want in `pl/events.html`. If MartialMatch changes the HTML, re-open that file, find the first card block and the closing `</div>` after the last card, note line numbers, and update both constants.
+   - `SLUGS` — folder names under `data/` must stay in sync with **`server/dev-test-martialmatch-v1/worker.js`** (`NUMERIC_TO_SLUG`).
    - Source paths at the top (`SRC`, `EVENTS_SRC`, `SCHED_SRC`, `FIGHTS_SRC`) if you snapshot new research files.
 
-2. **`server/test-martialmatch/worker.js`**
-   - `REPO_RAW_BASE` — must match this repo on GitHub (`andruwik777/dev.martialmatch.com`) and default branch.
-   - `NUMERIC_TO_SLUG` — must list every numeric event id the app can request in test mode and match the folders under `data/`.
+2. **`server/dev-test-martialmatch-v1/worker.js`**
+   - `REPO_RAW_BASE` — must match this repo on GitHub and default branch.
+   - `NUMERIC_TO_SLUG` — every numeric event id the app can request in test mode, matching folders under `data/`.
 
-3. **`server/martialmatch/worker.js`** (prod proxy) — deploy to your prod Worker; update `allowedOrigins` if the app is served from a custom domain.
+3. **`server/prod-martialmatch-v1/worker.js`** (prod proxy) — deploy to your prod Worker; CORS allowlist matches page origins (see `ALLOWED_CORS_ORIGINS` / worker CORS helpers).
 
-After changing fixtures, run the script, commit `data/`, push, then the test Worker can fetch the new raw URLs.
+After changing fixtures, run the scripts, commit `data/`, push, then the test Worker can fetch the new raw URLs.
 
 ## Challenges & learnings
 
@@ -149,11 +173,9 @@ After changing fixtures, run the script, commit `data/`, push, then the test Wor
    - Wrapper (if the Pages project name matches): `https://andruwik777.github.io/martialmatch.com/pl/events`  
    In practice, GitHub Pages puts the **repository name** as the first path segment (`…/github.io/<repo>/pl/events/…`), e.g. stable **`martialmatch`** → `https://andruwik777.github.io/martialmatch/pl/events`.
 
-5. **`mode=test` and fixture data** — The **dev** repo includes a **test data** path: the Worker serves **pre-collected** snapshots from the official site, so in that mode the browser **does not** talk to the live official origin for those resources. Enable with the query parameter **`mode=test`**.
+5. **`mode=test` and fixture data** — The **dev-test** Worker serves **pre-collected** JSON/HTML from `server/dev-test-martialmatch-v1/data/` (via GitHub raw), so the browser **does not** hit the live official origin for those routes. Enable with **`?mode=test`**.
 
-6. **Two Cloudflare Workers** — Same split as above:
-   - **Dev / test** — small, curated fixture set covering many edge cases (served from repo raw + test worker).
-   - **Prod** — thin **proxy** to the **live** official site.
+6. **Three proxy variants** — **Prod** and **dev** Workers proxy the **live** site (with optional edge cache on stable routes). **Dev-test** serves **fixtures** only (no Worker cache). All three have a matching **WebSocket** service on Render for scoreboard (`WSS_BASE_BY_MODE` in [config.js](config.js)).
 
 7. **CSS theming** — The dev app UI uses one visual theme; **`mode=test`** uses **another** theme so test mode is visually distinct at a glance.
 
@@ -172,6 +194,14 @@ After changing fixtures, run the script, commit `data/`, push, then the test Wor
 14. **Connection lifetime vs the official upstream** — The custom WebSocket proxy does **not** drop browser connections on a **~1 minute** cadence the way the original upstream behavior can feel like; it **tracks subscriptions** and **prunes** clients that have actually disconnected so resources do not leak.
 
 15. **Debug-level UI: HTTP refresh + WSS “traffic”** — On the **Fights** tab, **spinning** refresh by the label reflects **in-flight** `/fights` fetches, and a **small status dot** reflects connection state; a **throttled** neutral pulse on send/receive helps confirm live WSS **without** flooding the screen during busy mats.
+
+16. **Two URL filters, one picker** — **`events_filter`** (Events tab: which event rows stay visible) and **`slug_filter`** (Fights / Schedule: fights and harmonogram rows for the active event) are **independent** query params. The filter panel reuses the same athlete list UI, but **Apply** writes the param for the **current tab**. Deep links can include both; opening aggregate on Events with `events_filter` pre-set must load **every** event’s starting list before row visibility is correct.
+
+17. **Favorites and `athleteKey`** — URL filters use MartialMatch **`publicId`** (per registration). The same human can have **different `publicId`s** on different events, so favorites cannot be “just publicId”. The app stores favorites in **`localStorage`** (`mm_cm_favorites_v1`) under a heuristic **`athleteKey`**: normalized `firstName|lastName|academyId` (see `athleteKeyFromParts` in `current-matches.js`). That lets ☆ follow a person across events in the picker; it is **not** guaranteed unique (name collisions, academy changes) but works well for coach/parent workflows. **Show favorites only** is a view toggle in the filter panel, not part of the shareable URL.
+
+18. **Tabs → filter → content** — On Current matches, **Events / Fights / Schedule** tabs sit **above** the filter toolbar so context is clear per tab. Filter button labels state intent explicitly (e.g. `Filter fights by participants` vs `Filtered fights by N participants`). An **active event** card in the header tracks `slug`; the app auto-selects the first event when the list loads so Fights/Schedule stay usable.
+
+19. **Events-tab aggregate load** — On Events, opening the filter loads **all** starting lists to build one merged athlete pool (`ensureAggregateParticipantMaps`). Until that finishes, the panel shows a loading hint and hides Apply/Clear — important for **`mode=test`** when every fixture fetch goes to GitHub raw without edge cache.
 
 ## Releasing a new version (dev → prod)
 
