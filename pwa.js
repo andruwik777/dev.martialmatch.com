@@ -165,9 +165,8 @@
       });
   }
 
-  function linkManifest() {
+  function attachManifest(href) {
     if (!document.head) return;
-    var href = absoluteFromRepo("manifest.webmanifest");
     var existing = document.querySelector('link[rel="manifest"]');
     if (existing) {
       existing.setAttribute("href", href);
@@ -177,6 +176,19 @@
     link.rel = "manifest";
     link.href = href;
     document.head.appendChild(link);
+  }
+
+  /** Prod only — same prod.css probe as theme-loader.js (dev skips manifest so tab favicon is not pinned to blue PNG). */
+  function linkManifestIfProd() {
+    fetch(absoluteFromRepo("prod.css"), { method: "HEAD", cache: "no-cache" })
+      .then(function (res) {
+        if (res.ok) {
+          attachManifest(absoluteFromRepo("manifest.webmanifest"));
+        }
+      })
+      .catch(function () {
+        /* dev: no manifest */
+      });
   }
 
   function onTabChanged(tab) {
@@ -213,7 +225,7 @@
     repoBasePath: repoBasePath,
   };
 
-  linkManifest();
+  linkManifestIfProd();
   registerServiceWorker();
 
   if (document.readyState === "loading") {
