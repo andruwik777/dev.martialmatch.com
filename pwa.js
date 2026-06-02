@@ -178,16 +178,25 @@
     document.head.appendChild(link);
   }
 
-  /** Prod only — same prod.css probe as theme-loader.js (dev skips manifest so tab favicon is not pinned to blue PNG). */
-  function linkManifestIfProd() {
+  /** Prod vs dev/test — same prod.css probe as theme-loader.js. */
+  function linkManifestForEnv() {
+    var testMode = /[?&]mode=test(?:&|$|#)/i.test(global.location.href);
     fetch(absoluteFromRepo("prod.css"), { method: "HEAD", cache: "no-cache" })
       .then(function (res) {
         if (res.ok) {
           attachManifest(absoluteFromRepo("manifest.webmanifest"));
+        } else if (testMode) {
+          attachManifest(absoluteFromRepo("manifest-dev-test.webmanifest"));
+        } else {
+          attachManifest(absoluteFromRepo("manifest-dev.webmanifest"));
         }
       })
       .catch(function () {
-        /* dev: no manifest */
+        if (testMode) {
+          attachManifest(absoluteFromRepo("manifest-dev-test.webmanifest"));
+        } else {
+          attachManifest(absoluteFromRepo("manifest-dev.webmanifest"));
+        }
       });
   }
 
@@ -225,7 +234,7 @@
     repoBasePath: repoBasePath,
   };
 
-  linkManifestIfProd();
+  linkManifestForEnv();
   registerServiceWorker();
 
   if (document.readyState === "loading") {
