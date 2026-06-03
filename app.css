@@ -2178,21 +2178,6 @@ body.mm-cm-help-open {
   margin-top: 0.15em;
 }
 
-.mm-cm-help__lane-legend {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.mm-cm-help__lane-legend-states {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.35rem 0.5rem;
-  font-size: 0.8125rem;
-  color: #b8beca;
-}
-
 .mm-cm-help__dl {
   margin: 0 0 0.65rem;
   font-size: 0.875rem;
