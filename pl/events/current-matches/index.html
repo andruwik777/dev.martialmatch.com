@@ -447,21 +447,61 @@
         Each event row (and the active-event header) shows <strong>three small dots</strong>
         — a quick traffic-light style check for that competition:
       </p>
-      <dl class="mm-cm-help__dl">
-        <dt>Red</dt>
-        <dd>
-          <strong>Starting list</strong> — filled = athletes found; ring only = empty
-          response; cross = request failed.
-        </dd>
-        <dt>Yellow</dt>
-        <dd>
-          <strong>Schedule</strong> — same filled / ring / cross meaning.
-        </dd>
-        <dt>Green</dt>
-        <dd>
-          <strong>Fights</strong> — same filled / ring / cross meaning.
-        </dd>
-      </dl>
+      <ul class="mm-cm-help__list mm-cm-help__lane-list">
+        <li>
+          <span class="mm-event-lane-slot" aria-hidden="true">
+            <span
+              class="mm-event-lane mm-event-lane--starting mm-event-lane--filled"
+            ></span>
+          </span>
+          <span>
+            <strong>Starting list</strong> — athletes registered for this event.
+          </span>
+        </li>
+        <li>
+          <span class="mm-event-lane-slot" aria-hidden="true">
+            <span
+              class="mm-event-lane mm-event-lane--schedules mm-event-lane--filled"
+            ></span>
+          </span>
+          <span>
+            <strong>Schedule</strong> — category blocks and times.
+          </span>
+        </li>
+        <li>
+          <span class="mm-event-lane-slot" aria-hidden="true">
+            <span
+              class="mm-event-lane mm-event-lane--fights mm-event-lane--filled"
+            ></span>
+          </span>
+          <span>
+            <strong>Fights</strong> — fight queue / pairings available.
+          </span>
+        </li>
+      </ul>
+      <p class="mm-cm-help__note mm-cm-help__lane-legend">
+        <span class="mm-cm-help__lane-legend-states" aria-hidden="true">
+          <span class="mm-event-lane-slot">
+            <span
+              class="mm-event-lane mm-event-lane--starting mm-event-lane--filled"
+            ></span>
+          </span>
+          filled
+          <span class="mm-event-lane-slot">
+            <span
+              class="mm-event-lane mm-event-lane--starting mm-event-lane--outline"
+            ></span>
+          </span>
+          ring
+          <span class="mm-event-lane-slot">
+            <span
+              class="mm-event-lane mm-event-lane--starting mm-event-lane--error"
+            ></span>
+          </span>
+          cross
+        </span>
+        Filled = data found; ring only = empty response; cross = request failed.
+      </p>
 
       <h3 class="mm-cm-help__heading">Filters &amp; sharing</h3>
       <p>
