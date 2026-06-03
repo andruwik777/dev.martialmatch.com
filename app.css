@@ -2273,6 +2273,22 @@ body.mm-cm-help-open {
   max-width: 22rem;
 }
 
+.mm-cm-qr__lead.is-hidden {
+  display: none !important;
+}
+
+.mm-cm-qr__notice {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: #fcd34d;
+  max-width: 22rem;
+}
+
+.mm-cm-qr__notice.is-hidden {
+  display: none !important;
+}
+
 .mm-cm-qr__canvas {
   display: block;
   width: min(85vw, 18rem);

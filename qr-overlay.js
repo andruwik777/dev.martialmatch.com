@@ -8,12 +8,49 @@
   var qrNavBtn = document.getElementById("mm-cm-nav-qr");
   var qrRootEl = document.getElementById("mm-cm-qr-root");
   var qrCloseBtn = document.getElementById("mm-cm-qr-close");
+  var qrTitleEl = document.getElementById("mm-cm-qr-title");
+  var qrLeadEl = document.getElementById("mm-cm-qr-lead");
+  var qrNoticeEl = document.getElementById("mm-cm-qr-notice");
   var qrCanvasEl = document.getElementById("mm-cm-qr-canvas");
   var qrErrorEl = document.getElementById("mm-cm-qr-error");
 
   if (!qrNavBtn || !qrRootEl) return;
 
+  var MAX_QR_URL_LENGTH = 1500;
+  var QR_TITLE_DEFAULT = "Scan this page";
+  var QR_TITLE_FALLBACK = "Scan app link";
+  var QR_LEAD_DEFAULT =
+    "Opens the same view — tab, event, and URL filters included.";
+  var QR_NOTICE_FALLBACK =
+    "Your current filter is too complex for a QR code. Scan this link to open the app, then set your filter again.";
+
   var libLoadPromise = null;
+
+  function appBaseUrl() {
+    return new URL("/pl/events/", window.location.origin).href;
+  }
+
+  function resolveQrTarget() {
+    var pageUrl = window.location.href;
+    if (pageUrl.length <= MAX_QR_URL_LENGTH) {
+      return { url: pageUrl, useFallback: false };
+    }
+    return { url: appBaseUrl(), useFallback: true };
+  }
+
+  function setQrCopy(useFallback) {
+    if (qrTitleEl) {
+      qrTitleEl.textContent = useFallback ? QR_TITLE_FALLBACK : QR_TITLE_DEFAULT;
+    }
+    if (qrLeadEl) {
+      qrLeadEl.textContent = QR_LEAD_DEFAULT;
+      qrLeadEl.classList.toggle("is-hidden", useFallback);
+    }
+    if (qrNoticeEl) {
+      qrNoticeEl.textContent = useFallback ? QR_NOTICE_FALLBACK : "";
+      qrNoticeEl.classList.toggle("is-hidden", !useFallback);
+    }
+  }
 
   function libScriptUrl() {
     var scripts = document.getElementsByTagName("script");
@@ -94,6 +131,8 @@
 
   function renderQrContent() {
     if (!qrCanvasEl || !qrErrorEl) return;
+    var target = resolveQrTarget();
+    setQrCopy(target.useFallback);
     qrErrorEl.textContent = "";
     qrErrorEl.classList.add("is-hidden");
     qrCanvasEl.classList.remove("is-hidden");
@@ -101,7 +140,7 @@
     ensureLibLoaded()
       .then(function () {
         try {
-          drawQrOnCanvas(window.location.href, qrCanvasEl);
+          drawQrOnCanvas(target.url, qrCanvasEl);
         } catch (err) {
           showQrError(
             "Could not generate QR code for this link — it may be too long."
