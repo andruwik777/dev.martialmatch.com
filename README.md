@@ -53,9 +53,23 @@ Live **fights** and the **scoreboard** (timer, status, points) are updated in re
 
 ### Deployment (where the proxies run)
 
-- **WebSocket** scoreboard proxy: deployed on **[Render](https://render.com/)** (see [server/README-wss.md](server/README-wss.md) and `WSS_BASE_BY_MODE` in [config.js](config.js)).
-- **HTTP** API proxy: **Cloudflare Workers** (see `BASE_BY_MODE` in [config.js](config.js) and the [For developers](#for-developers) section).
-- **Static UI:** this repo, **GitHub Pages**.
+- **Static UI:** this repo, **GitHub Pages** (dev on **`master`**, prod on the separate repo’s **`release`** branch).
+- **HTTP** API proxy: **Cloudflare Workers** — autodeploy from GitHub on **every push** to the watched branch (see `BASE_BY_MODE` in [config.js](config.js)).
+- **WebSocket** scoreboard proxy: **[Render](https://render.com/)** — autodeploy from GitHub when commits touch **`server/`** (Render root directory; see [server/README-wss.md](server/README-wss.md) and `WSS_BASE_BY_MODE` in [config.js](config.js)).
+
+### Autodeploy from GitHub
+
+Proxies deploy automatically from this repository — **no manual dashboard upload or copy-paste**.
+
+| Component | Platform | Autodeploy trigger |
+|-----------|----------|-------------------|
+| **Static UI** | GitHub Pages | Push to **`master`** (dev) or **`release`** (prod repo) |
+| **HTTP proxy** | Cloudflare Workers | **Every commit** on the watched branch |
+| **WebSocket proxy** | Render | Commits that change files under **`server/`** only ([root directory](https://render.com/docs/monorepo-support#setting-a-root-directory) = `server`) |
+
+After `git push`, wait for GitHub Pages / Cloudflare / Render to finish before testing prod. UI-only changes do not redeploy Render; Worker-only changes do not rebuild the static site.
+
+See [server/README-wss.md](server/README-wss.md) for Render start commands per environment.
 
 ### High-level diagram (ASCII)
 
@@ -152,9 +166,9 @@ python server/dev-test-martialmatch-v1/convert_starting_lists_html_to_json.py
    - `REPO_RAW_BASE` — must match this repo on GitHub and default branch.
    - `NUMERIC_TO_SLUG` — every numeric event id the app can request in test mode, matching folders under `data/`.
 
-3. **`server/prod-martialmatch-v1/worker.js`** (prod proxy) — deploy to your prod Worker; CORS allowlist matches page origins (see `ALLOWED_CORS_ORIGINS` / worker CORS helpers).
+3. **`server/prod-martialmatch-v1/worker.js`** (prod proxy) — edit CORS allowlist as needed (`ALLOWED_CORS_ORIGINS` / worker CORS helpers); **push** and the Worker autodeploy picks it up.
 
-After changing fixtures, run the scripts, commit `data/`, push, then the test Worker can fetch the new raw URLs.
+After changing fixtures, run the scripts, commit `data/`, push — the test Worker fetches the new raw URLs on the next deploy.
 
 ## Challenges & learnings
 
@@ -187,9 +201,9 @@ After changing fixtures, run the scripts, commit `data/`, push, then the test Wo
 
 11. **“Observer” / fan-out on the WebSocket proxy** — The proxy maintains **one upstream socket** to MartialMatch and, for each **scoreboard channel** clients subscribe to, **broadcasts** each upstream message to **every** connected browser that asked for that channel. One upstream message can therefore update many interested clients efficiently.
 
-12. **Autodeploy for three environments** — **Front end:** this repo on **GitHub Pages** (free; **dev** and **dev-test** on `master`, **prod** from the separate release repo/branch as documented above). **HTTP** proxy: **Cloudflare Workers** (free tiers). **WebSocket** proxy: the Node service on **Render** (free tier) — all three can track pushes so a full-stack change can roll out in parallel when you need it.
+12. **Autodeploy from GitHub** — **Front end:** GitHub Pages (**dev** on `master`, **prod** from the release repo/branch). **HTTP** proxy: Cloudflare Workers redeploy on **every push**. **WebSocket** proxy: Render redeploys when **`server/`** changes (root directory `server`). No manual Worker deploy in the dashboard.
 
-13. **Render *root directory* vs Cloudflare *every push*** — If you set a [root directory](https://render.com/docs/monorepo-support#setting-a-root-directory) for the WebSocket service, Render’s **autodeploy only runs when changed files fall under that directory**; changes elsewhere in a monorepo are ignored. **Cloudflare Workers** tied to the repo typically **redeploy on any push** to the watched branch. Know which half of the stack is “noisy” when you monorepo other code next to the proxy.
+13. **Render `server/` root vs Cloudflare every push** — Render’s [root directory](https://render.com/docs/monorepo-support#setting-a-root-directory) is **`server`**, so autodeploy runs only when commits touch that tree; frontend or docs changes elsewhere skip Render. Cloudflare Workers redeploy on **any** push to the watched branch. Keep proxy code under **`server/`**, UI at repo root.
 
 14. **Connection lifetime vs the official upstream** — The custom WebSocket proxy does **not** drop browser connections on a **~1 minute** cadence the way the original upstream behavior can feel like; it **tracks subscriptions** and **prunes** clients that have actually disconnected so resources do not leak.
 
@@ -278,7 +292,7 @@ Work in the **dev** repo clone, on branch **`release`** (or create/update it fro
 
    Uses **GNU** `sed -i` (Git Bash on Windows, Linux). On **macOS** use `sed -i ''` before the script on each line, e.g. `sed -i '' 's|…|…|g' config.js`.
 
-   Adjust hostnames if your deployed Workers use different names; keep them aligned with **`server/`** and what you actually deployed.
+   Adjust hostnames if your deployed Workers use different names; keep them aligned with **`server/`** in this repo (autodeploy reads from GitHub).
 
 4. Rename the prod theme file so GitHub Pages loads **`prod.css`** (see [Dev vs prod styling](#dev-vs-prod-styling-two-repos)):
 
@@ -326,12 +340,11 @@ One-liner release script (set the valid tag at the beginning):
    tag=v3.0.8 && git checkout release && cp README.md README.md.keep-ours && git merge master -X theirs -m "Merge master to release for release with tag $tag" && mv README.md.keep-ours README.md && git add README.md && git commit --amend --no-edit && git tag "$tag" && git push release-origin HEAD:release && git push release-origin "$tag" && git checkout master
    ```
 
-9. **Cloudflare Worker (prod)** — easy to forget: **`git push` does not deploy the proxy.** After the release, copy the repo’s **`server/prod-martialmatch-v1/worker.js`** into the **`prod-martialmatch-v1`** Worker in the Cloudflare dashboard, then click **Deploy** so production matches what you ship in **`server/`**.  
-   Direct link (this project’s prod Worker → **Production**): [dash.cloudflare.com → prod-martialmatch-v1](https://dash.cloudflare.com/6b47963c94d644f8d9b7f1cf6f1405bd/workers/services/edit/prod-martialmatch-v1/production).
+9. **Proxies** — no manual step. Pushing to **`release-origin`** triggers GitHub Pages and Cloudflare Worker autodeploy. Render redeploys automatically when the release commit includes changes under **`server/`**.
 
 **Notes**
 
 - **`release-origin`** is used for **every** push to the prod GitHub repo in this workflow; do not mix in `release_origin`.
 - If you merge **`release`** back into **`master`** on the **dev** repo, **`prod.css`** can reappear on dev—usually you keep **`prod.css`** only on commits that exist on **`release-origin`**, or you revert **`prod.css`** on **`master`** after the release.
 - Update **`REPO_RAW_BASE`** (and similar) in any **test** Worker bundled for prod if fixture raw URLs must point at the **prod** repo or branch.
-- Deploying Workers is separate from **`git push`**; align Worker code with what you kept under **`server/`**.
+- Proxy source of truth is **`server/`** on GitHub; Cloudflare and Render autodeploy from pushes — no separate manual deploy step.
