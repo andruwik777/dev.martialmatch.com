@@ -39,6 +39,16 @@
       </button>
       <button
         type="button"
+        class="mm-nav-link mm-cm-header-nav__qr"
+        id="mm-cm-nav-qr"
+        aria-haspopup="dialog"
+        aria-controls="mm-cm-qr-root"
+        aria-label="Show QR code for this page link"
+      >
+        QR-code
+      </button>
+      <button
+        type="button"
         class="mm-nav-link mm-cm-header-nav__help"
         id="mm-cm-nav-help"
         aria-haspopup="dialog"
@@ -473,7 +483,7 @@
       <ol class="mm-cm-help__list mm-cm-help__list--ordered">
         <li>Open the filter dropdown, pick athletes, then <strong>Apply</strong>.</li>
         <li>
-          Tap <strong>Share</strong> or copy the link — others open the same
+          Tap <strong>Share</strong>, <strong>QR-code</strong>, or copy the link — others open the same
           filtered view for that tab’s param.
         </li>
       </ol>
@@ -550,7 +560,39 @@
     </div>
   </div>
 
+  <div
+    id="mm-cm-qr-root"
+    class="mm-cm-help mm-cm-qr is-hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="mm-cm-qr-title"
+    aria-hidden="true"
+  >
+    <div class="mm-cm-qr__body">
+      <h2 id="mm-cm-qr-title" class="mm-cm-qr__title">Scan this page</h2>
+      <p class="mm-cm-qr__lead">
+        Opens the same view — tab, event, and URL filters included.
+      </p>
+      <canvas
+        id="mm-cm-qr-canvas"
+        class="mm-cm-qr__canvas"
+        aria-hidden="true"
+      ></canvas>
+      <p id="mm-cm-qr-error" class="mm-cm-qr__error is-hidden" role="alert"></p>
+    </div>
+    <div class="mm-cm-help__bar">
+      <button
+        type="button"
+        id="mm-cm-qr-close"
+        class="mm-cm-help__close mm-filter-apply-btn"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+
   <script src="../../../pwa.js" defer></script>
   <script src="current-matches.js" defer></script>
+  <script src="../../../qr-overlay.js" defer></script>
 </body>
 </html>
