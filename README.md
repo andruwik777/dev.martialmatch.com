@@ -337,7 +337,7 @@ Work in the **dev** repo clone, on branch **`release`** (or create/update it fro
 
 One-liner release script (set the valid tag at the beginning): 
    ```bash
-   tag=v3.0.8 && git checkout release && cp README.md README.md.keep-ours && git merge master -X theirs -m "Merge master to release for release with tag $tag" && mv README.md.keep-ours README.md && git add README.md && git commit --amend --no-edit && git tag "$tag" && git push release-origin HEAD:release && git push release-origin "$tag" && git checkout master
+   tag=v3.0.9 && git checkout release && cp README.md README.md.keep-ours && git merge master -X theirs -m "Merge master to release for release with tag $tag" && mv README.md.keep-ours README.md && git add README.md && git commit --amend --no-edit && git tag "$tag" && git push release-origin HEAD:release && git push release-origin "$tag" && git checkout master
    ```
 
 9. **Proxies** — no manual step. Pushing to **`release-origin`** triggers GitHub Pages and Cloudflare Worker autodeploy. Render redeploys automatically when the release commit includes changes under **`server/`**.
