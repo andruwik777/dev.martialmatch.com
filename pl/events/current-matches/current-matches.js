@@ -2748,6 +2748,49 @@
     document.addEventListener("keydown", handleCmOverlayEscape);
   }
 
+  function ensureQrcodegenLoaded() {
+    if (typeof qrcodegen !== "undefined") {
+      return Promise.resolve();
+    }
+    if (ensureQrcodegenLoaded._promise) {
+      return ensureQrcodegenLoaded._promise;
+    }
+    ensureQrcodegenLoaded._promise = new Promise(function (resolve, reject) {
+      var script = document.createElement("script");
+      script.src = qrcodegenScriptUrl();
+      script.onload = function () {
+        if (typeof qrcodegen !== "undefined") {
+          resolve();
+        } else {
+          reject(new Error("qrcodegen_missing"));
+        }
+      };
+      script.onerror = function () {
+        reject(new Error("qrcodegen_load_failed"));
+      };
+      document.head.appendChild(script);
+    });
+    return ensureQrcodegenLoaded._promise;
+  }
+
+  function qrcodegenScriptUrl() {
+    var scripts = document.getElementsByTagName("script");
+    for (var i = 0; i < scripts.length; i++) {
+      var src = scripts[i].getAttribute("src") || "";
+      if (src.indexOf("current-matches.js") === -1) continue;
+      return new URL("../../../qrcodegen.js", new URL(src, window.location.href)).href;
+    }
+    return new URL("../../../qrcodegen.js", window.location.href).href;
+  }
+
+  function showQrOverlayError(message) {
+    if (!qrCanvasEl || !qrErrorEl) return;
+    qrCanvasEl.classList.add("is-hidden");
+    qrCanvasEl.setAttribute("aria-hidden", "true");
+    qrErrorEl.textContent = message;
+    qrErrorEl.classList.remove("is-hidden");
+  }
+
   function drawQrCodeOnCanvas(url, canvas) {
     if (!canvas || typeof qrcodegen === "undefined") {
       throw new Error("qr_unavailable");
@@ -2790,15 +2833,21 @@
     qrErrorEl.classList.add("is-hidden");
     qrCanvasEl.classList.remove("is-hidden");
     qrCanvasEl.removeAttribute("aria-hidden");
-    try {
-      drawQrCodeOnCanvas(window.location.href, qrCanvasEl);
-    } catch (err) {
-      qrCanvasEl.classList.add("is-hidden");
-      qrCanvasEl.setAttribute("aria-hidden", "true");
-      qrErrorEl.textContent =
-        "Could not generate QR code for this link — it may be too long.";
-      qrErrorEl.classList.remove("is-hidden");
-    }
+    ensureQrcodegenLoaded()
+      .then(function () {
+        try {
+          drawQrCodeOnCanvas(window.location.href, qrCanvasEl);
+        } catch (err) {
+          showQrOverlayError(
+            "Could not generate QR code for this link — it may be too long."
+          );
+        }
+      })
+      .catch(function () {
+        showQrOverlayError(
+          "Could not load QR generator — check your connection and try again."
+        );
+      });
   }
 
   function openQrOverlay() {
