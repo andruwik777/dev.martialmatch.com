@@ -101,6 +101,58 @@ See [server/README-wss.md](server/README-wss.md) for Render start commands per e
 
 The browser talks only to **your** Worker and **your** `wss://` host; both components then reach the real site on your behalf.
 
+## Analytics & observability (production)
+
+Usage telemetry runs **only on the stable production site** (GitHub Pages repo with **`prod.css`** at the site root). **Dev** and **`mode=test`** builds do not send Web Analytics beacons or custom metrics — the same **`prod.css` `HEAD` probe** used for theming gates both layers.
+
+| Layer | Where | What it measures |
+|-------|--------|------------------|
+| **Cloudflare Web Analytics** | Browser → CF beacon | Page views, referrers, Core Web Vitals (managed dashboard; no cookies) |
+| **Workers Observability** | Prod Worker (`prod-martialmatch-v1`) | Request logs, errors, latency, CPU — Cloudflare dashboard |
+| **Custom metrics** | Browser → `POST /mm/metrics/collect` on prod Worker | Product events (filters, tabs, share, QR, PWA install, …) stored in **KV** + **D1** |
+
+### Cloudflare Web Analytics
+
+- **Client:** [`web-analytics.js`](web-analytics.js) — loads the Cloudflare Insights beacon after a successful **`prod.css`** probe.
+- **Dashboard:** Cloudflare → **Analytics & logs** → **Web Analytics** for the site hostname.
+- The public site token lives in `web-analytics.js` (beacon tokens are designed to be client-visible).
+
+### Workers Observability
+
+Enabled on the **prod** Worker only via [`server/prod-martialmatch-v1/wrangler.toml`](server/prod-martialmatch-v1/wrangler.toml):
+
+```toml
+[observability]
+enabled = true
+head_sampling_rate = 1
+```
+
+Use **Workers & Pages → prod-martialmatch-v1 → Observability** for live and historical traces (API proxy traffic, `/mm/metrics/collect`, errors).
+
+### Custom metrics (KV + D1)
+
+Prod-only **first-party** events — not a third-party tracker. The browser sends JSON to **`POST /mm/metrics/collect`** on the prod Worker ([`mm-metrics.js`](mm-metrics.js) + hooks in [`current-matches.js`](pl/events/current-matches/current-matches.js) and [`pwa.js`](pwa.js); handler [`server/prod-martialmatch-v1/metrics-collect.js`](server/prod-martialmatch-v1/metrics-collect.js)).
+
+**Cloudflare resources (prod Worker bindings):**
+
+| Binding | Resource | Role |
+|---------|----------|------|
+| `METRICS_KV` | KV namespace `MM_METRICS` | Daily counters (`metrics:share:YYYY-MM-DD`, `metrics:qr:…`, …) |
+| `METRICS_DB` | D1 database `mm-prod-metrics` | Row-level events (`session_start`, `tab_view`, `filter_apply`, …) |
+
+Bindings and IDs are in [`server/prod-martialmatch-v1/wrangler.toml`](server/prod-martialmatch-v1/wrangler.toml). One-time dashboard setup and the full event catalog: **[server/prod-martialmatch-v1/METRICS-SETUP.md](server/prod-martialmatch-v1/METRICS-SETUP.md)**.
+
+**KV (daily totals)** — simple click counters, e.g. `share_click`, `qr_open`, `help_open`, `filter_open`, `pwa_install_click`.
+
+**D1 (`events` table)** — contextual events with `client_id`, `session_id`, and JSON `props`, e.g.:
+
+- `filter_apply` — `{ kind: "events" | "slug", tab, count }` (Events filter vs Fights/Schedule filter)
+- `tab_view`, `favorite_toggle`, `event_select`, `share_outcome`, …
+
+No PII is stored (no athlete names, `publicId`s, slugs, or search text). **`mode=test`** skips custom metrics entirely.
+
+**Verify:** KV keys under **Workers → KV → MM_METRICS**; D1 SQL examples in [METRICS-SETUP.md](server/prod-martialmatch-v1/METRICS-SETUP.md).
+
 ## For developers
 
 Use **`mode=test`** in the page URL to point HTTP requests at the **fixture Worker** (curated snapshots, no live MartialMatch).
@@ -216,6 +268,8 @@ After changing fixtures, run the scripts, commit `data/`, push — the test Work
 18. **Tabs → filter → content** — On Current matches, **Events / Fights / Schedule** tabs sit **above** the filter toolbar so context is clear per tab. Filter button labels state intent explicitly (e.g. `Filter fights by participants` vs `Filtered fights by N participants`). An **active event** card in the header tracks `slug`; the app auto-selects the first event when the list loads so Fights/Schedule stay usable.
 
 19. **Events-tab aggregate load** — On Events, opening the filter loads **all** starting lists to build one merged athlete pool (`ensureAggregateParticipantMaps`). Until that finishes, the panel shows a loading hint and hides Apply/Clear — important for **`mode=test`** when every fixture fetch goes to GitHub raw without edge cache.
+
+20. **Production analytics on Cloudflare** — **Web Analytics** (pageviews), **Workers Observability** (prod Worker logs/traces), and **custom metrics** (KV daily counters + D1 event rows via `/mm/metrics/collect`) are active on the stable prod site only. Dev and **`mode=test`** skip client-side analytics; see [Analytics & observability (production)](#analytics--observability-production).
 
 ## Releasing a new version (dev → prod)
 
