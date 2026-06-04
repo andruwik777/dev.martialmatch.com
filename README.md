@@ -103,7 +103,7 @@ The browser talks only to **your** Worker and **your** `wss://` host; both compo
 
 ## Analytics & observability (production)
 
-Usage telemetry runs **only on the stable production site** (GitHub Pages repo with **`prod.css`** at the site root). **Dev** and **`mode=test`** builds do not send Web Analytics beacons or custom metrics — the same **`prod.css` `HEAD` probe** used for theming gates both layers.
+Usage telemetry runs **only on the stable production site** (GitHub Pages repo with **`prod.css`** at the site root). **Dev** and **`mode=test`** builds do not send Web Analytics beacons or custom metrics. Prod detection uses a **single** `HEAD` request to **`prod.css`** in [`theme-loader.js`](theme-loader.js) (`window.MM_PROD_PROBE`); PWA, Web Analytics, and custom metrics subscribe to that promise instead of probing again.
 
 | Layer | Where | What it measures |
 |-------|--------|------------------|
@@ -113,7 +113,7 @@ Usage telemetry runs **only on the stable production site** (GitHub Pages repo w
 
 ### Cloudflare Web Analytics
 
-- **Client:** [`web-analytics.js`](web-analytics.js) — loads the Cloudflare Insights beacon after a successful **`prod.css`** probe.
+- **Client:** [`web-analytics.js`](web-analytics.js) — loads the Cloudflare Insights beacon when **`MM_PROD_PROBE`** resolves true.
 - **Dashboard:** Cloudflare → **Analytics & logs** → **Web Analytics** for the site hostname.
 - The public site token lives in `web-analytics.js` (beacon tokens are designed to be client-visible).
 
@@ -171,7 +171,7 @@ WebSocket proxies are sibling Node services: `server/dev-martialmatch-v1/wss-pro
 
 ### Dev vs prod styling (two repos)
 
-After `app.css`, `theme-loader.js` sends a `HEAD` request for **`prod.css`** at the site root (next to `app.css`).
+After `app.css`, `theme-loader.js` sends one `HEAD` request for **`prod.css`** at the site root and sets **`window.MM_PROD_PROBE`** (shared by PWA, analytics, and metrics).
 
 | `prod.css` at root | URL | Extra CSS |
 |--------------------|-----|-----------|
