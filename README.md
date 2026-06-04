@@ -153,6 +153,17 @@ No PII is stored (no athlete names, `publicId`s, slugs, or search text). **`mode
 
 **Verify:** KV keys under **Workers → KV → MM_METRICS**; D1 SQL examples in [METRICS-SETUP.md](server/prod-martialmatch-v1/METRICS-SETUP.md).
 
+### Metrics stats dashboard (maintainer)
+
+**Prod Worker only:** `GET /mm/metrics/stats` — HTML tables (KV counters + D1 aggregates by UTC day). Not linked from the app.
+
+```
+https://prod-martialmatch-v1.andruwik777.workers.dev/mm/metrics/stats
+https://prod-martialmatch-v1.andruwik777.workers.dev/mm/metrics/stats?day=YYYY-MM-DD
+```
+
+**Access:** protect with **Cloudflare Zero Trust Access + Google** (allowlist your Gmail). No URL secret — sign in on any device. Step-by-step: [METRICS-SETUP.md §8](server/prod-martialmatch-v1/METRICS-SETUP.md).
+
 ## For developers
 
 Use **`mode=test`** in the page URL to point HTTP requests at the **fixture Worker** (curated snapshots, no live MartialMatch).
