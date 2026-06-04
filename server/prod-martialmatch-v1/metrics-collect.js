@@ -140,7 +140,7 @@ export async function handleMetricsCollect(request, env, allowOrigin) {
     return jsonResponse(allowOrigin, 403, { ok: false, error: "origin_not_allowed" });
   }
 
-  if (!isProdAppReferer(request)) {
+  if (!isProdMetricsRequest(request)) {
     return jsonResponse(allowOrigin, 403, { ok: false, error: "not_prod_app" });
   }
 
