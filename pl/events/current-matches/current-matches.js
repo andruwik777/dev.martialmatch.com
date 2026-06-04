@@ -3670,13 +3670,14 @@
       }
     }
 
-    syncClubHeaderCheckboxDisabledState(onlyFav, onlySel);
+    var hasSearchInput = String(queryRaw || "").length > 0;
+    syncClubHeaderCheckboxDisabledState(onlyFav, onlySel, hasSearchInput);
   }
 
-  /** Club select-all is read-only while list shows a subset (favorites / checked). */
-  function syncClubHeaderCheckboxDisabledState(onlyFav, onlySel) {
+  /** Club select-all is read-only while list shows a subset (favorites / checked / search). */
+  function syncClubHeaderCheckboxDisabledState(onlyFav, onlySel, hasSearchInput) {
     if (!filterListRootEl) return;
-    var lock = Boolean(onlyFav || onlySel);
+    var lock = Boolean(onlyFav || onlySel || hasSearchInput);
     var sections = filterListRootEl.querySelectorAll(".mm-filter-club");
     for (var i = 0; i < sections.length; i++) {
       var headerCb = clubHeaderCheckboxInSection(sections[i]);
