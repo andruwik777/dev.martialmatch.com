@@ -5,3 +5,13 @@ compatibility_date = "2026-04-23"
 [observability]
 enabled = true
 head_sampling_rate = 1
+
+# Bindings for custom metrics (prod only). Create resources first — see METRICS-SETUP.md
+# [[kv_namespaces]]
+# binding = "METRICS_KV"
+# id = "<kv-namespace-id>"
+#
+# [[d1_databases]]
+# binding = "METRICS_DB"
+# database_name = "mm-prod-metrics"
+# database_id = "<d1-database-id>"
